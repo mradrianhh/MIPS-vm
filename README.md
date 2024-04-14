@@ -1,7 +1,5 @@
 # 8-bit VM
 
-!(images/Technical Architecture.drawio.png)
-
 # Specifications
 
 - 1 byte page size.
