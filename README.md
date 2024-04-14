@@ -1,6 +1,6 @@
 # 8-bit VM
 
-!(Technical Architecture.drawio.png)
+!(images/Technical Architecture.drawio.png)
 
 # Specifications
 
