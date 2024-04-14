@@ -18,6 +18,9 @@ The machine has 13 GRPs, plus PC, LR and SP.
 
 # Instruction Set Architecture
 
+- Immediate Move
+MOV r0, #1 ; Move immediate value 1 to register r0.
+
 # Tasks and planning
 
 - Allocate a virtual address space to hold the guest memory in host RAM.
