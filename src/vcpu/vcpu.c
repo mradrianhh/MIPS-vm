@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "vcpu.h"
 #include "../device_table/device_table.h"
@@ -9,6 +10,7 @@
 static int rc;
 
 static void registers_init(vCPU_t *vcpu);
+static void *vcpu_loop(void *vargp);
 
 int vcpu_init(vCPU_t *vcpu)
 {
@@ -24,6 +26,27 @@ int vcpu_init(vCPU_t *vcpu)
 static void registers_init(vCPU_t *vcpu)
 {
     memset(&vcpu->registers, 0, sizeof(vcpu->registers));
+}
+
+int vcpu_start(vCPU_t *vcpu)
+{
+    printf("Device vCPU(%d) starting...\n", vcpu->device_info.device_id);
+
+    pthread_create(&(vcpu->device_info.device_tid), NULL, vcpu_loop, (void *)vcpu);
+
+    return 0;
+}
+
+static void *vcpu_loop(void *vargp)
+{
+    vCPU_t *vcpu = (vCPU_t *)vargp;
+
+    while (1)
+    {\
+        sleep(3);
+    }
+
+    pthread_exit(NULL);
 }
 
 void registers_dump(vCPU_t *vcpu)

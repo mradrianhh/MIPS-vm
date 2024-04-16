@@ -15,6 +15,8 @@ typedef struct vMEMORY_CONTROLLER vMEMORY_CONTROLLER_t;
 
 int vmemory_controller_init(vMEMORY_CONTROLLER_t* controller);
 
+int vmemory_controller_start(vMEMORY_CONTROLLER_t *controller);
+
 void memory_dump(vMEMORY_CONTROLLER_t *controller);
 
 #endif

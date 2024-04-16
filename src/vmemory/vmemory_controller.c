@@ -1,7 +1,10 @@
 #include <stdio.h>
+#include <unistd.h>
 
 #include "vmemory_controller.h"
 #include "../device_table/device_table.h"
+
+static void *vmemory_controller_loop(void *vargp);
 
 int vmemory_controller_init(vMEMORY_CONTROLLER_t *controller)
 {
@@ -13,6 +16,27 @@ int vmemory_controller_init(vMEMORY_CONTROLLER_t *controller)
     vmemory_example_load(&controller->vmemory);
 
     return 0;
+}
+
+int vmemory_controller_start(vMEMORY_CONTROLLER_t *controller)
+{
+    printf("Device vMEMORY_CONTROLLER(%d) starting...\n", controller->device_info.device_id);
+
+    pthread_create(&(controller->device_info.device_tid), NULL, vmemory_controller_loop, (void *)controller);
+
+    return 0;
+}
+
+static void *vmemory_controller_loop(void *vargp)
+{
+    vMEMORY_CONTROLLER_t *controller = (vMEMORY_CONTROLLER_t *)vargp;
+
+    while (1)
+    {
+        sleep(3);
+    }
+
+    pthread_exit(NULL);
 }
 
 void memory_dump(vMEMORY_CONTROLLER_t *controller)

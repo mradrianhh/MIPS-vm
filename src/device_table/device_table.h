@@ -2,6 +2,7 @@
 #define _8BITVM_DEVICE_TABLE_H_
 
 #include <stdint.h>
+#include <pthread.h>
 
 #define MAX_DEVICES 256
 #define DEVICE_TABLE_SIZE sizeof(DEVICE_TABLE_ENTRY_t) * MAX_DEVICES
@@ -12,8 +13,10 @@
 
 struct DEVICE_TABLE_ENTRY 
 {
+    pthread_t device_tid;
     uint8_t device_id;
     uint8_t device_type;
+
 };
 typedef struct DEVICE_TABLE_ENTRY DEVICE_TABLE_ENTRY_t;
 

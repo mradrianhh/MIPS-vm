@@ -48,6 +48,8 @@ typedef struct vCPU vCPU_t;
 
 int vcpu_init(vCPU_t* vcpu);
 
+int vcpu_start(vCPU_t *vcpu);
+
 void registers_dump(vCPU_t *vcpu);
 
 #endif

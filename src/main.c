@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <pthread.h>
 
 #include "vcpu/vcpu.h"
 #include "vclock/vclock.h"
@@ -24,12 +25,13 @@ static vCLOCK_t vclock;
 int main()
 {
     init();
-    // start();
     device_table_dump();
     registers_dump(&vcpu);
     memory_dump(&vmemory_controller);
 
-    return 0;
+    start();
+
+    pthread_exit(NULL);
 }
 
 void init()
@@ -68,9 +70,15 @@ void init()
 
 void start()
 {
-    if (rc = vsysbus_start(&sysbus))
+    if (rc = vcpu_start(&vcpu))
     {
-        printf("Error: vsysbus_start() returned with rc=%d", rc);
+        printf("Error: vcpu_start() returned with rc=%d", rc);
+        exit(1);
+    }
+
+    if (rc = vmemory_controller_start(&vmemory_controller))
+    {
+        printf("Error: vmemory_controller_start() returned with rc=%d", rc);
         exit(1);
     }
 }
