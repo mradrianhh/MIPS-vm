@@ -2,8 +2,7 @@
 #define _8BITVM_VCPU_H_
 
 #include <stdint.h>
-
-#include "../common/common.h"
+#include "../device_table/device_table.h"
 
 #define REG_NUM 16
 #define REGISTERS_SIZE sizeof(REGISTER_t) * REG_NUM
@@ -42,12 +41,13 @@ struct REGISTERS
 typedef struct REGISTERS REGISTERS_t;
 
 struct vCPU {
-    uint8_t device_id;
-    uint8_t device_type;
+    DEVICE_TABLE_ENTRY_t device_info;
     REGISTERS_t registers;
 };
 typedef struct vCPU vCPU_t;
 
 int vcpu_init(vCPU_t* vcpu);
+
+void registers_dump(vCPU_t *vcpu);
 
 #endif

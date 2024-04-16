@@ -1,12 +1,15 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "vsysbus_buffer.h"
 
 int vsysbus_buffer_init(vSYSBUS_BUFFER_t buffer)
 {
+    printf("\tvSYSBUS_BUFFER initializing...\n");
     buffer = malloc(vSYSBUS_BUFFER_SIZE);
     memset(buffer, 0, vSYSBUS_BUFFER_SIZE);
+
     return 0;
 }
 

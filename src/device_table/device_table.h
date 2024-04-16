@@ -1,21 +1,13 @@
-#ifndef _8BITVM_COMMON_H_
-#define _8BITVM_COMMON_H_
+#ifndef _8BITVM_DEVICE_TABLE_H_
+#define _8BITVM_DEVICE_TABLE_H_
 
 #include <stdint.h>
 
 #define MAX_DEVICES 256
 #define DEVICE_TABLE_SIZE sizeof(DEVICE_TABLE_ENTRY_t) * MAX_DEVICES
 
-extern uint8_t device_id_count;
-
-//typedef enum 
-//{
-//    DEVICE_TYPE_CPU = 1,
-//    DEVICE_TYPE_MEMORY = 2,
-//    DEVICE_TYPE_CLOCK = 3,
-//} DEVICE_TYPE_t;
 #define DEVICE_TYPE_CPU     (uint8_t)(0x01)
-#define DEVICE_TYPE_MEMORY  (uint8_t)(0x02)
+#define DEVICE_TYPE_MEMORY_CONTROLLER  (uint8_t)(0x02)
 #define DEVICE_TYPE_CLOCK   (uint8_t)(0x03)
 
 struct DEVICE_TABLE_ENTRY 
@@ -33,12 +25,18 @@ struct DEVICE_TABLE
 };
 typedef struct DEVICE_TABLE DEVICE_TABLE_t;
 
-void device_table_init(DEVICE_TABLE_t* device_table);
+extern DEVICE_TABLE_t device_table;
 
-void device_table_add(DEVICE_TABLE_t* device_table, DEVICE_TABLE_ENTRY_t entry);
+extern uint8_t device_id_count;
 
-void device_table_sort(DEVICE_TABLE_t* device_table);
+int device_table_init();
+
+void device_table_add(DEVICE_TABLE_ENTRY_t entry);
+
+void device_table_sort();
 
 char* convert_device_type_str(uint8_t device_type);
+
+void device_table_dump();
 
 #endif
