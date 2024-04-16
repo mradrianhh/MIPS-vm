@@ -43,7 +43,7 @@ typedef struct REGISTERS REGISTERS_t;
 
 struct vCPU {
     uint8_t device_id;
-    DEVICE_TYPE_t device_type;
+    uint8_t device_type;
     REGISTERS_t registers;
 };
 typedef struct vCPU vCPU_t;

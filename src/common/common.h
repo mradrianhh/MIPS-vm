@@ -8,31 +8,37 @@
 
 extern uint8_t device_id_count;
 
-typedef enum 
-{
-    DEVICE_TYPE_CPU = 1,
-    DEVICE_TYPE_MEMORY = 2,
-    DEVICE_TYPE_CLOCK = 3,
-} DEVICE_TYPE_t;
-
-struct DEVICE_TABLE 
-{
-    uint8_t current_entry;
-    DEVICE_TABLE_ENTRY_t* device_table;
-};
-typedef struct DEVICE_TABLE DEVICE_TABLE_t;
+//typedef enum 
+//{
+//    DEVICE_TYPE_CPU = 1,
+//    DEVICE_TYPE_MEMORY = 2,
+//    DEVICE_TYPE_CLOCK = 3,
+//} DEVICE_TYPE_t;
+#define DEVICE_TYPE_CPU     (uint8_t)(0x01)
+#define DEVICE_TYPE_MEMORY  (uint8_t)(0x02)
+#define DEVICE_TYPE_CLOCK   (uint8_t)(0x03)
 
 struct DEVICE_TABLE_ENTRY 
 {
     uint8_t device_id;
-    DEVICE_TYPE_t device_type;
+    uint8_t device_type;
 };
 typedef struct DEVICE_TABLE_ENTRY DEVICE_TABLE_ENTRY_t;
+
+struct DEVICE_TABLE 
+{
+    DEVICE_TABLE_ENTRY_t* current_entry;
+    DEVICE_TABLE_ENTRY_t* start;
+    DEVICE_TABLE_ENTRY_t* table;
+};
+typedef struct DEVICE_TABLE DEVICE_TABLE_t;
 
 void device_table_init(DEVICE_TABLE_t* device_table);
 
 void device_table_add(DEVICE_TABLE_t* device_table, DEVICE_TABLE_ENTRY_t entry);
 
 void device_table_sort(DEVICE_TABLE_t* device_table);
+
+char* convert_device_type_str(uint8_t device_type);
 
 #endif

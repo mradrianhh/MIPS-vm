@@ -9,7 +9,7 @@
 
 struct vCLOCK {
     uint8_t device_id;
-    DEVICE_TYPE_t device_type;
+    uint8_t device_type;
     uint8_t freq; // max frequency: 255 hz
 };
 typedef struct vCLOCK vCLOCK_t;

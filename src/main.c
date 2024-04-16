@@ -6,6 +6,7 @@
 #include "vclock/vclock.h"
 #include "vsysbus/vsysbus.h"
 #include "vmemory/vmemory.h"
+#include "common/common.h"
 
 static void init();
 static void start();
@@ -13,6 +14,7 @@ static void stop();
 
 static void memory_dump(vMEMORY_t *vmemory);
 static void register_dump(vCPU_t *vcpu);
+static void device_table_dump(DEVICE_TABLE_t *device_table);
 
 static int rc;
 static char input;
@@ -22,12 +24,24 @@ static vSYSBUS_t sysbus;
 static vCPU_t vcpu;
 static vMEMORY_t vmemory;
 static vCLOCK_t vclock;
+static DEVICE_TABLE_t device_table;
 
 int main()
 {
     // init();
     // start();
-    vclock_init(&vclock);
+    device_table_init(&device_table);
+
+    DEVICE_TABLE_ENTRY_t entry;
+    entry.device_id = 1;
+    entry.device_type = DEVICE_TYPE_CLOCK;
+    device_table_add(&device_table, entry);
+
+    entry.device_id = 2;
+    entry.device_type = DEVICE_TYPE_CPU;
+    device_table_add(&device_table, entry);
+
+    device_table_dump(&device_table);
 
     return 0;
 }
@@ -102,4 +116,20 @@ static void register_dump(vCPU_t *vcpu)
     printf("PC:  [0x%02x]\n", vcpu->registers.PC);
     printf("LR:  [0x%02x]\n", vcpu->registers.LR);
     printf("SP:  [0x%02x]\n", vcpu->registers.SP);
+}
+
+static void device_table_dump(DEVICE_TABLE_t *device_table)
+{
+    printf("*\n");
+    printf("* Device Table Dump\n");
+    printf("*\n");
+    device_table->table = device_table->start;
+    printf("Start *: %d\n", (int)device_table->start);
+    printf("Current *: %d\n", (int)device_table->current_entry);
+    for (int i = 0; i < MAX_DEVICES; i++)
+    {
+        printf("Device table *: %d\t", (int)&device_table->table[i]);
+        char* type_str = convert_device_type_str(device_table->table[i].device_type);
+        printf("Device ID: %d | Device Type: %s\n", device_table->table[i].device_id, type_str);
+    }
 }
