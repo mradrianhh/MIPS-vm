@@ -47,12 +47,12 @@ static void *vmemory_controller_loop(void *vargp)
     {
         for (int i = 0; i < cpu_amount; i++)
         {
-            packet = vsysbus_read(device_info_cpus[i].device_id);
+            /*packet = vsysbus_read(device_info_cpus[i].device_id);
             if (packet != NULL)
             {
                 printf("vMEMORY_CONTROLLER(%d) - Package received from Device v%s(%d): [0x%02x]\n", controller->device_info.device_id, convert_device_type_str(device_info_cpus[i].device_type), packet->device_id, packet->data);
                 process_sysbus_packet(controller, packet);
-            }
+            }*/
         }
         sleep(3);
     }

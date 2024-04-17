@@ -44,7 +44,7 @@ static void *vcpu_loop(void *vargp)
     while (1)
     {
         write_vsysbus(vcpu, i++);
-        sleep(3);
+        sleep(1);
     }
 
     pthread_exit(NULL);

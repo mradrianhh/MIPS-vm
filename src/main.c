@@ -24,18 +24,75 @@ static vCLOCK_t vclock;
 
 int main()
 {
-    init();
-    device_table_dump();
-    registers_dump(&vcpu);
-    memory_dump(&vmemory_controller);
+    // init();
+    // device_table_dump();
+    // registers_dump(&vcpu);
+    // memory_dump(&vmemory_controller);
 
-    start();
+    // start();
 
-    //sleep(10);
+    if (rc = vsysbus_init())
+    {
+        printf("Error: vsysbus_init() returned with rc=%d", rc);
+        exit(1);
+    }
 
-    vsysbus_dump();
+    char input;
+    vSYSBUS_PACKET_t packet1 = {
+        .device_id = 1,
+        .data = 1,
+    };
+    vSYSBUS_PACKET_t packet2 = {
+        .device_id = 2,
+        .data = 2,
+    };
+    vSYSBUS_PACKET_t result;
+    int rc = 0;
+    while (1)
+    {
+        printf("| 1 - write sysbus 1 | 2 - read sysbus 1 | 3 - write sysbus 2 | 4 - read sysbus 2 |\n| d - sysbus dump | q - terminate |\n");
+        scanf("%c", &input);
+        switch (input)
+        {
+        case '1':
+            vsysbus_write(&packet1);
+            break;
+        case '2':
+            rc = vsysbus_read(1, &result);
+            if (rc == 0)
+            {
+                printf("Test: Read package {Device ID: [%d] Data: [0x%02x]}\n", result.device_id, result.data);
+            }
+            else 
+            {
+                printf("Test: Read package returned with RC=%d\n", rc);
+            }
+            break;
+        case '3':
+            vsysbus_write(&packet2);
+            break;
+        case '4':
+            rc = vsysbus_read(2, &result);
+            if (rc == 0)
+            {
+                printf("Test: Read package {Device ID: [%d] Data: [0x%02x]}\n", result.device_id, result.data);
+            }
+            else 
+            {
+                printf("Test: Read package returned with RC=%d\n", rc);
+            }
+            break;
+        case 'd':
+            vsysbus_dump();
+            break;
+        case 'q':
+            return 0;
+            break;
+        }
+    }
 
-    pthread_exit(NULL);
+    return 0;
+    // pthread_exit(NULL);
 }
 
 void init()
