@@ -10,7 +10,7 @@
 struct vSYSBUS_PACKET
 {
     uint8_t device_id;
-    uint8_t packet;
+    uint8_t data;
 };
 typedef struct vSYSBUS_PACKET vSYSBUS_PACKET_t;
 

@@ -23,7 +23,7 @@ int vsysbus_write(vSYSBUS_PACKET_t *packet)
     pthread_mutex_lock(&vsysbus.mutex);
     vsysbus.buffer = vsysbus.current;
     vsysbus.buffer->device_id = packet->device_id;
-    vsysbus.buffer->packet = packet->packet;
+    vsysbus.buffer->data = packet->data;
     vsysbus.current++;
     pthread_mutex_unlock(&vsysbus.mutex);
     return 0;
@@ -51,7 +51,7 @@ void vsysbus_dump()
     printf("* vSYSBUS Dump\n");
     printf("*\n");
 
-    //pthread_mutex_lock(&vsysbus.mutex);
+    pthread_mutex_lock(&vsysbus.mutex);
     vsysbus.buffer = vsysbus.start;
     printf("Start *: %d\n", (int)vsysbus.start);
     printf("Current *: %d\n", (int)vsysbus.current);
@@ -59,7 +59,7 @@ void vsysbus_dump()
     for (int i = 0; &vsysbus.buffer[i] != vsysbus.current; i++)
     {
         printf("vSYSBUS *: %d\t", (int)&vsysbus.buffer[i]);
-        printf("Device ID: %d\tPacket: [0x%02x]\n", vsysbus.buffer[i].device_id, vsysbus.buffer[i].packet);
+        printf("Device ID: %d\tData: [0x%02x]\n", vsysbus.buffer[i].device_id, vsysbus.buffer[i].data);
     }
-    //pthread_mutex_unlock(&vsysbus.mutex);
+    pthread_mutex_unlock(&vsysbus.mutex);
 }

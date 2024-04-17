@@ -8,9 +8,8 @@
 #include "../device_table/device_table.h"
 #include "vsysbus/vsysbus.h"
 
-static int rc;
-
 static void registers_init(vCPU_t *vcpu);
+static void write_vsysbus(vCPU_t *vcpu, uint8_t data);
 static void *vcpu_loop(void *vargp);
 
 int vcpu_init(vCPU_t *vcpu)
@@ -41,17 +40,23 @@ int vcpu_start(vCPU_t *vcpu)
 static void *vcpu_loop(void *vargp)
 {
     vCPU_t *vcpu = (vCPU_t *)vargp;
-    vSYSBUS_PACKET_t packet = {
-        .device_id = vcpu->device_info.device_id,
-        .packet = vcpu->device_info.device_type,
-    };
+    uint8_t i = 0;
     while (1)
     {
-        vsysbus_write(&packet);
+        write_vsysbus(vcpu, i++);
         sleep(3);
     }
 
     pthread_exit(NULL);
+}
+
+static void write_vsysbus(vCPU_t *vcpu, uint8_t data)
+{
+    vSYSBUS_PACKET_t packet = {
+        .device_id = vcpu->device_info.device_id,
+        .data = data,
+    };
+    vsysbus_write(&packet);
 }
 
 void registers_dump(vCPU_t *vcpu)

@@ -18,6 +18,10 @@ typedef struct vMEMORY vMEMORY_t;
 // Initializes virtual memory.
 int vmemory_init(vMEMORY_t* vmemory);
 
+PAGE_t vmemory_read(vMEMORY_t *vmemory, uint8_t address);
+
+int vmemory_write(vMEMORY_t *vmemory, PAGE_t page, uint8_t address);
+
 // Loads virtual memory with example data.
 void vmemory_example_load(vMEMORY_t* vmemory);
 

@@ -28,14 +28,9 @@ int vclock_start(vCLOCK_t *vclock)
 static void *vclock_loop(void *vargp)
 {
     vCLOCK_t *vclock = (vCLOCK_t *)vargp;
-    vSYSBUS_PACKET_t packet = {
-        .device_id = vclock->device_info.device_id,
-        .packet = vclock->device_info.device_type,
-    };
 
     while (1)
     {
-        vsysbus_write(&packet);
         sleep(3);
     }
 
