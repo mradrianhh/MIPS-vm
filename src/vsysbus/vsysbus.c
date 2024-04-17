@@ -1,62 +1,65 @@
-#include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
-#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "vsysbus.h"
 
-static void *vsysbus_loop(void *vargp);
+static vSYSBUS_t vsysbus;
 
-static int rc;
-
-int vsysbus_init(vSYSBUS_t *sysbus)
+int vsysbus_init()
 {
     printf("vSYSBUS initializing...\n");
-    sysbus->running = VSYSBUS_START;
-    if (rc = vsysbus_buffer_init(sysbus->buffer))
-    {
-        printf("Error: vsysbus_buffer_init() returned with rc=%d", rc);
-        exit(1);
-    }
-
-    // TODO: Start vSYSBUS_BUFFER_CONTROLLER
-    // vsysbus_buffer_controller_init(sysbus->buffer)
-    // vsysbus_buffer_controller_start()
+    vsysbus.buffer = malloc(vSYSBUS_BUFFER_SIZE);
+    vsysbus.start = vsysbus.buffer;
+    vsysbus.current = vsysbus.buffer;
+    memset(vsysbus.buffer, 0, vSYSBUS_BUFFER_SIZE);
+    pthread_mutex_init(&vsysbus.mutex, NULL);
 
     return 0;
 }
 
-int vsysbus_start(vSYSBUS_t *sysbus)
+int vsysbus_write(vSYSBUS_PACKET_t *packet)
 {
-    sysbus->running = VSYSBUS_START;
-    printf("vSYSBUS starting...\n");
-
-    pthread_create(&(sysbus->thread_id), NULL, vsysbus_loop, (void *)sysbus);
-
+    pthread_mutex_lock(&vsysbus.mutex);
+    vsysbus.buffer = vsysbus.current;
+    vsysbus.buffer->device_id = packet->device_id;
+    vsysbus.buffer->packet = packet->packet;
+    vsysbus.current++;
+    pthread_mutex_unlock(&vsysbus.mutex);
     return 0;
 }
 
-static void *vsysbus_loop(void *vargp)
+vSYSBUS_PACKET_t *vsysbus_read(uint8_t device_id)
 {
-    vSYSBUS_t *sysbus = (vSYSBUS_t *)vargp;
-
-    while (sysbus->running)
+    pthread_mutex_lock(&vsysbus.mutex);
+    vsysbus.buffer = vsysbus.start;
+    for (int i = 0; &vsysbus.buffer[i] != vsysbus.current; i++)
     {
-        vSYSBUS_BUFFER_PACKET_t input = vsysbus_buffer_fetch_packet(sysbus->buffer);
-        if (!(input.packet + input.device_id))
+        if (vsysbus.buffer[i].device_id == device_id)
         {
-            printf("vSYSBUS processing packet { device_id: %d, packet: %d }\n", input.device_id, input.packet);
+            pthread_mutex_unlock(&vsysbus.mutex);
+            return &vsysbus.buffer[i];
         }
-        sleep(3);
     }
+    pthread_mutex_unlock(&vsysbus.mutex);
+    return NULL;
 }
 
-int vsysbus_stop(vSYSBUS_t *sysbus)
+void vsysbus_dump()
 {
-    sysbus->running = VSYSBUS_STOP;
-    printf("vSYSBUS stopping...\n");
+    printf("*\n");
+    printf("* vSYSBUS Dump\n");
+    printf("*\n");
 
-    pthread_join(sysbus->thread_id, NULL);
+    //pthread_mutex_lock(&vsysbus.mutex);
+    vsysbus.buffer = vsysbus.start;
+    printf("Start *: %d\n", (int)vsysbus.start);
+    printf("Current *: %d\n", (int)vsysbus.current);
 
-    return 0;
+    for (int i = 0; &vsysbus.buffer[i] != vsysbus.current; i++)
+    {
+        printf("vSYSBUS *: %d\t", (int)&vsysbus.buffer[i]);
+        printf("Device ID: %d\tPacket: [0x%02x]\n", vsysbus.buffer[i].device_id, vsysbus.buffer[i].packet);
+    }
+    //pthread_mutex_unlock(&vsysbus.mutex);
 }

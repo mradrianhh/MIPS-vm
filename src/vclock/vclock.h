@@ -14,4 +14,6 @@ typedef struct vCLOCK vCLOCK_t;
 
 int vclock_init(vCLOCK_t* vclock);
 
+int vclock_start(vCLOCK_t* vclock);
+
 #endif

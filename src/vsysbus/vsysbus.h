@@ -1,26 +1,34 @@
-// The sysbus is an event loop where devices can toss out events, and subscribers can notify to them.
-#ifndef _8BITVM_VSYSBUS_H_
-#define _8BITVM_VSYSBUS_H_
+#ifndef _8BITVM_VSYSBUS_BUFFER_H_
+#define _8BITVM_VSYSBUS_BUFFER_H_
 
 #include <stdint.h>
 #include <pthread.h>
 
-#include "vsysbus_buffer.h"
+#define vSYSBUS_BUFFER_ITEM_NUM 100
+#define vSYSBUS_BUFFER_SIZE sizeof(vSYSBUS_PACKET_t) * vSYSBUS_BUFFER_ITEM_NUM
 
-#define VSYSBUS_START 0
-#define VSYSBUS_STOP  1
+struct vSYSBUS_PACKET
+{
+    uint8_t device_id;
+    uint8_t packet;
+};
+typedef struct vSYSBUS_PACKET vSYSBUS_PACKET_t;
 
-struct vSYSBUS {
-    pthread_t thread_id;
-    vSYSBUS_BUFFER_t buffer;
-    int running;
+struct vSYSBUS
+{
+    vSYSBUS_PACKET_t *start;
+    vSYSBUS_PACKET_t *current;
+    vSYSBUS_PACKET_t *buffer;
+    pthread_mutex_t mutex;
 };
 typedef struct vSYSBUS vSYSBUS_t;
 
-int vsysbus_init(vSYSBUS_t* sysbus);
+int vsysbus_init();
 
-int vsysbus_start(vSYSBUS_t* sysbus);
+int vsysbus_write(vSYSBUS_PACKET_t *packet);
 
-int vsysbus_stop(vSYSBUS_t* sysbus);
+vSYSBUS_PACKET_t *vsysbus_read(uint8_t device_id);
+
+void vsysbus_dump();
 
 #endif

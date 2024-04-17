@@ -2,12 +2,13 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #include "vcpu/vcpu.h"
 #include "vclock/vclock.h"
-#include "vsysbus/vsysbus.h"
 #include "vmemory/vmemory_controller.h"
 #include "device_table/device_table.h"
+#include "vsysbus/vsysbus.h"
 
 static void init();
 static void start();
@@ -17,7 +18,6 @@ static int rc;
 static char input;
 static int running;
 
-static vSYSBUS_t sysbus;
 static vCPU_t vcpu;
 static vMEMORY_CONTROLLER_t vmemory_controller;
 static vCLOCK_t vclock;
@@ -31,6 +31,10 @@ int main()
 
     start();
 
+    //sleep(10);
+
+    vsysbus_dump();
+
     pthread_exit(NULL);
 }
 
@@ -43,7 +47,7 @@ void init()
         exit(1);
     }
 
-    if (rc = vsysbus_init(&sysbus))
+    if (rc = vsysbus_init())
     {
         printf("Error: vsysbus_init() returned with rc=%d", rc);
         exit(1);
@@ -76,18 +80,15 @@ void start()
         exit(1);
     }
 
+    if (rc = vclock_start(&vclock))
+    {
+        printf("Error: vclock_start() returned with rc=%d", rc);
+        exit(1);
+    }
+
     if (rc = vmemory_controller_start(&vmemory_controller))
     {
         printf("Error: vmemory_controller_start() returned with rc=%d", rc);
-        exit(1);
-    }
-}
-
-void stop()
-{
-    if (rc = vsysbus_stop(&sysbus))
-    {
-        printf("Error: vsysbus_stop() returned with rc=%d", rc);
         exit(1);
     }
 }

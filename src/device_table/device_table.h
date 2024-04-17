@@ -25,8 +25,16 @@ struct DEVICE_TABLE
     DEVICE_TABLE_ENTRY_t* current_entry;
     DEVICE_TABLE_ENTRY_t* start;
     DEVICE_TABLE_ENTRY_t* table;
+    pthread_mutex_t mutex;
 };
 typedef struct DEVICE_TABLE DEVICE_TABLE_t;
+
+struct DEVICE_TABLE_READ_RETURN
+{
+    DEVICE_TABLE_ENTRY_t* entry_ptr;
+    uint8_t array_size;
+};
+typedef struct DEVICE_TABLE_READ_RETURN DEVICE_TABLE_READ_RETURN_t;
 
 extern DEVICE_TABLE_t device_table;
 
@@ -37,6 +45,10 @@ int device_table_init();
 void device_table_add(DEVICE_TABLE_ENTRY_t entry);
 
 void device_table_sort();
+
+DEVICE_TABLE_READ_RETURN_t* device_table_read_id(uint8_t device_id);
+
+DEVICE_TABLE_READ_RETURN_t* device_table_read_type(uint8_t device_type);
 
 char* convert_device_type_str(uint8_t device_type);
 

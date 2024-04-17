@@ -6,6 +6,7 @@
 
 #include "vcpu.h"
 #include "../device_table/device_table.h"
+#include "vsysbus/vsysbus.h"
 
 static int rc;
 
@@ -40,9 +41,13 @@ int vcpu_start(vCPU_t *vcpu)
 static void *vcpu_loop(void *vargp)
 {
     vCPU_t *vcpu = (vCPU_t *)vargp;
-
+    vSYSBUS_PACKET_t packet = {
+        .device_id = vcpu->device_info.device_id,
+        .packet = vcpu->device_info.device_type,
+    };
     while (1)
-    {\
+    {
+        vsysbus_write(&packet);
         sleep(3);
     }
 
