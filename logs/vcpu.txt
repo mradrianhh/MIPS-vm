@@ -1,0 +1,6 @@
+[Thread: 0x00000000] - [UTC: 19-04-2024 18-33-20] - Device vCPU(2) - INFO: Initializing.
+[Thread: 0x00000000] - [UTC: 19-04-2024 18-33-20] - Device vCPU(2) - INFO: Starting.
+[Thread: 0x7f4825998640] - [UTC: 19-04-2024 18-33-20] - Device vCPU(2) - INFO: Running on thread [0x7f4825998640].
+[Thread: 0x7f4825998640] - [UTC: 19-04-2024 18-33-26] - Device vCPU(2) - TRACE: Fetched page [0x00] from address [0x00].
+[Thread: 0x7f4825998640] - [UTC: 19-04-2024 18-33-38] - Device vCPU(2) - TRACE: Fetched page [0x01] from address [0x01].
+[Thread: 0x7f4825998640] - [UTC: 19-04-2024 18-33-47] - Device vCPU(2) - TRACE: Fetched page [0x02] from address [0x02].

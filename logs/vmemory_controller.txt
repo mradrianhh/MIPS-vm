@@ -1,0 +1,8 @@
+[Thread: 0x00000000] - [UTC: 19-04-2024 18-33-20] - Device vMEMORY_CONTROLLER(3) - INFO: Initializing.
+[Thread: 0x00000000] - [UTC: 19-04-2024 18-33-20] - Device vMEMORY_CONTROLLER(3) - TRACE: Package {Data: 0x00 Access: 0x00 Control: 0x03} written to vMEMORYBUS_IN.
+[Thread: 0x00000000] - [UTC: 19-04-2024 18-33-26] - Device vMEMORY_CONTROLLER(3) - TRACE: Package {Data: 0x00 Access: 0x00 Control: 0x01} read from vMEMORYBUS_OUT.
+[Thread: 0x00000000] - [UTC: 19-04-2024 18-33-29] - Device vMEMORY_CONTROLLER(3) - TRACE: Package {Data: 0x00 Access: 0x01 Control: 0x03} written to vMEMORYBUS_IN.
+[Thread: 0x00000000] - [UTC: 19-04-2024 18-33-38] - Device vMEMORY_CONTROLLER(3) - TRACE: Package {Data: 0x01 Access: 0x00 Control: 0x01} read from vMEMORYBUS_OUT.
+[Thread: 0x00000000] - [UTC: 19-04-2024 18-33-41] - Device vMEMORY_CONTROLLER(3) - TRACE: Package {Data: 0x00 Access: 0x02 Control: 0x03} written to vMEMORYBUS_IN.
+[Thread: 0x00000000] - [UTC: 19-04-2024 18-33-47] - Device vMEMORY_CONTROLLER(3) - TRACE: Package {Data: 0x02 Access: 0x00 Control: 0x01} read from vMEMORYBUS_OUT.
+[Thread: 0x00000000] - [UTC: 19-04-2024 18-33-50] - Device vMEMORY_CONTROLLER(3) - TRACE: Package {Data: 0x00 Access: 0x03 Control: 0x03} written to vMEMORYBUS_IN.

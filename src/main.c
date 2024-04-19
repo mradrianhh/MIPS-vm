@@ -6,93 +6,32 @@
 
 #include "vcpu/vcpu.h"
 #include "vclock/vclock.h"
-#include "vmemory/vmemory_controller.h"
+#include "vmemory/vmemory.h"
 #include "device_table/device_table.h"
 #include "vsysbus/vsysbus.h"
 
 static void init();
 static void start();
-static void stop();
+static void shutdown();
 
 static int rc;
 static char input;
 static int running;
 
 static vCPU_t vcpu;
-static vMEMORY_CONTROLLER_t vmemory_controller;
+static vMEMORY_t vmemory;
 static vCLOCK_t vclock;
 
 int main()
 {
-    // init();
-    // device_table_dump();
-    // registers_dump(&vcpu);
-    // memory_dump(&vmemory_controller);
+    init();
 
-    // start();
+    start();
 
-    if (rc = vsysbus_init())
-    {
-        printf("Error: vsysbus_init() returned with rc=%d", rc);
-        exit(1);
-    }
-
-    char input;
-    vSYSBUS_PACKET_t packet1 = {
-        .device_id = 1,
-        .data = 1,
-    };
-    vSYSBUS_PACKET_t packet2 = {
-        .device_id = 2,
-        .data = 2,
-    };
-    vSYSBUS_PACKET_t result;
-    int rc = 0;
-    while (1)
-    {
-        printf("| 1 - write sysbus 1 | 2 - read sysbus 1 | 3 - write sysbus 2 | 4 - read sysbus 2 |\n| d - sysbus dump | q - terminate |\n");
-        scanf("%c", &input);
-        switch (input)
-        {
-        case '1':
-            vsysbus_write(&packet1);
-            break;
-        case '2':
-            rc = vsysbus_read(1, &result);
-            if (rc == 0)
-            {
-                printf("Test: Read package {Device ID: [%d] Data: [0x%02x]}\n", result.device_id, result.data);
-            }
-            else 
-            {
-                printf("Test: Read package returned with RC=%d\n", rc);
-            }
-            break;
-        case '3':
-            vsysbus_write(&packet2);
-            break;
-        case '4':
-            rc = vsysbus_read(2, &result);
-            if (rc == 0)
-            {
-                printf("Test: Read package {Device ID: [%d] Data: [0x%02x]}\n", result.device_id, result.data);
-            }
-            else 
-            {
-                printf("Test: Read package returned with RC=%d\n", rc);
-            }
-            break;
-        case 'd':
-            vsysbus_dump();
-            break;
-        case 'q':
-            return 0;
-            break;
-        }
-    }
-
-    return 0;
-    // pthread_exit(NULL);
+    scanf("%c", &input);
+    shutdown();
+    printf("Terminating. . .\n");
+    pthread_exit(NULL);
 }
 
 void init()
@@ -104,9 +43,9 @@ void init()
         exit(1);
     }
 
-    if (rc = vsysbus_init())
+    if (rc = vmemory_init(&vmemory))
     {
-        printf("Error: vsysbus_init() returned with rc=%d", rc);
+        printf("Error: vmemory_init() returned with rc=%d", rc);
         exit(1);
     }
 
@@ -121,16 +60,16 @@ void init()
         printf("Error: vclock_init() returned with rc=%d", rc);
         exit(1);
     }
-
-    if (rc = vmemory_controller_init(&vmemory_controller))
-    {
-        printf("Error: vmemory_controller_init() returned with rc=%d", rc);
-        exit(1);
-    }
 }
 
 void start()
 {
+    if (rc = vmemory_start(&vmemory))
+    {
+        printf("Error: vmemory_start() returned with rc=%d", rc);
+        exit(1);
+    }
+
     if (rc = vcpu_start(&vcpu))
     {
         printf("Error: vcpu_start() returned with rc=%d", rc);
@@ -142,10 +81,25 @@ void start()
         printf("Error: vclock_start() returned with rc=%d", rc);
         exit(1);
     }
+}
 
-    if (rc = vmemory_controller_start(&vmemory_controller))
+void shutdown()
+{
+    if (rc = vclock_shutdown(&vclock))
     {
-        printf("Error: vmemory_controller_start() returned with rc=%d", rc);
+        printf("Error: vclock_shutdown() returned with rc=%d", rc);
+        exit(1);
+    }
+
+    if (rc = vcpu_shutdown(&vcpu))
+    {
+        printf("Error: vcpu_shutdown() returned with rc=%d", rc);
+        exit(1);
+    }
+
+    if (rc = vmemory_shutdown(&vmemory))
+    {
+        printf("Error: vmemory_shutdown() returned with rc=%d", rc);
         exit(1);
     }
 }

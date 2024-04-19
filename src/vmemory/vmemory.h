@@ -3,26 +3,29 @@
 
 #include <stdint.h>
 
-#define PAGE_NUM 256
-#define MEMORY_SIZE sizeof(PAGE_t) * PAGE_NUM
+#include "device_table/device_table.h"
+#include "logger/logger.h"
+
+#define PAGE_NUM                    256
+#define MEMORY_SIZE                 sizeof(PAGE_t) * PAGE_NUM
 
 typedef uint8_t PAGE_t;
 
 struct vMEMORY 
 {
+    LOGGER_t logger;
+    DEVICE_TABLE_ENTRY_t *device_info;
     PAGE_t* start;
-    PAGE_t* memory;
 };
 typedef struct vMEMORY vMEMORY_t;
 
 // Initializes virtual memory.
 int vmemory_init(vMEMORY_t* vmemory);
 
-PAGE_t vmemory_read(vMEMORY_t *vmemory, uint8_t address);
+int vmemory_start(vMEMORY_t *vmemory);
 
-int vmemory_write(vMEMORY_t *vmemory, PAGE_t page, uint8_t address);
+int vmemory_shutdown(vMEMORY_t *vmemory);
 
-// Loads virtual memory with example data.
-void vmemory_example_load(vMEMORY_t* vmemory);
+void memory_dump(vMEMORY_t *vmemory);
 
 #endif

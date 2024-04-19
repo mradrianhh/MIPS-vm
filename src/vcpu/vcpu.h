@@ -2,10 +2,9 @@
 #define _8BITVM_VCPU_H_
 
 #include <stdint.h>
-#include "../device_table/device_table.h"
-
-#define REG_NUM 16
-#define REGISTERS_SIZE sizeof(REGISTER_t) * REG_NUM
+#include "device_table/device_table.h"
+#include "vmemory_controller.h"
+#include "logger/logger.h"
 
 #define BIT0 (uint8_t)(0b00000001)
 #define BIT1 (uint8_t)(0b00000010)
@@ -41,14 +40,19 @@ struct REGISTERS
 typedef struct REGISTERS REGISTERS_t;
 
 struct vCPU {
-    DEVICE_TABLE_ENTRY_t device_info;
+    LOGGER_t logger;
+    DEVICE_TABLE_ENTRY_t *device_info;
     REGISTERS_t registers;
+    vMEMORY_CONTROLLER_t vmemory_controller;
+    
 };
 typedef struct vCPU vCPU_t;
 
 int vcpu_init(vCPU_t* vcpu);
 
 int vcpu_start(vCPU_t *vcpu);
+
+int vcpu_shutdown(vCPU_t *vcpu);
 
 void registers_dump(vCPU_t *vcpu);
 

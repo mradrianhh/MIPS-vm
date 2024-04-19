@@ -12,13 +12,15 @@ struct vSYSBUS_PACKET
 {
     uint8_t device_id;
     uint8_t data;
+    uint8_t access;
+    uint8_t control;
 };
 typedef struct vSYSBUS_PACKET vSYSBUS_PACKET_t;
 
 /// @struct
-/// [start] points at the first address in memory.
-/// [current] points at the current position in memory.
-/// [next] points at the next available position in memory.
+/// [start] points at the first address in the bus/buffer.
+/// [current] points at the current position in bus/buffer.
+/// [next] points at the next available position in bus/buffer.
 struct vSYSBUS
 {
     vSYSBUS_PACKET_t *start;

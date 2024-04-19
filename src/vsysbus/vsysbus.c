@@ -51,16 +51,25 @@ int vsysbus_read(uint8_t device_id, vSYSBUS_PACKET_t *packet)
         return 0;
     }
 
+    int distance_from_end = 0;
     for (; vsysbus.current->device_id != device_id && vsysbus.current >= vsysbus.start; vsysbus.current--)
-        ;
-    
+    {
+        distance_from_end++;
+    }
+
     if (vsysbus.current->device_id == device_id)
     {
         *packet = *(vsysbus.current);
+        // shift all values above current-pointer down once, and adjust next-pointer.
+        for(int i = 0; i < distance_from_end; i++)
+        {
+            *(vsysbus.current) = *(++(vsysbus.current));
+        }
+        vsysbus.next--;
         pthread_mutex_unlock(&(vsysbus.mutex));
         return 0;
     }
-    
+
     pthread_mutex_unlock(&(vsysbus.mutex));
     packet = NULL;
     return 0;
