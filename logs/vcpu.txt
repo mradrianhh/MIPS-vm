@@ -1,6 +1,17 @@
-[Thread: 0x00000000] - [UTC: 19-04-2024 18-33-20] - Device vCPU(2) - INFO: Initializing.
-[Thread: 0x00000000] - [UTC: 19-04-2024 18-33-20] - Device vCPU(2) - INFO: Starting.
-[Thread: 0x7f4825998640] - [UTC: 19-04-2024 18-33-20] - Device vCPU(2) - INFO: Running on thread [0x7f4825998640].
-[Thread: 0x7f4825998640] - [UTC: 19-04-2024 18-33-26] - Device vCPU(2) - TRACE: Fetched page [0x00] from address [0x00].
-[Thread: 0x7f4825998640] - [UTC: 19-04-2024 18-33-38] - Device vCPU(2) - TRACE: Fetched page [0x01] from address [0x01].
-[Thread: 0x7f4825998640] - [UTC: 19-04-2024 18-33-47] - Device vCPU(2) - TRACE: Fetched page [0x02] from address [0x02].
+[Thread: 0x00000000] - [UTC: 19-04-2024 19-31-43] - Device vCPU(2) - INFO: Initializing.
+[Thread: 0x00000000] - [UTC: 19-04-2024 19-31-43] - Device vCPU(2) - INFO: Starting.
+[Thread: 0x7f31e17c4640] - [UTC: 19-04-2024 19-31-43] - Device vCPU(2) - INFO: Running on thread [0x7f31e17c4640].
+[Thread: 0x7f31e17c4640] - [UTC: 19-04-2024 19-31-49] - Device vCPU(2) - TRACE: Fetched page [0x00] from address [0x00].
+[Thread: 0x7f31e17c4640] - [UTC: 19-04-2024 19-31-58] - Device vCPU(2) - TRACE: Fetched page [0x01] from address [0x01].
+[Thread: 0x7f31e17c4640] - [UTC: 19-04-2024 19-32-10] - Device vCPU(2) - TRACE: Fetched page [0x02] from address [0x02].
+[Thread: 0x7f31e17c4640] - [UTC: 19-04-2024 19-32-19] - Device vCPU(2) - TRACE: Fetched page [0x03] from address [0x03].
+[Thread: 0x7f31e17c4640] - [UTC: 19-04-2024 19-32-28] - Device vCPU(2) - TRACE: Fetched page [0x04] from address [0x04].
+[Thread: 0x7f31e17c4640] - [UTC: 19-04-2024 19-32-40] - Device vCPU(2) - TRACE: Fetched page [0x05] from address [0x05].
+[Thread: 0x7f31e17c4640] - [UTC: 19-04-2024 19-32-52] - Device vCPU(2) - TRACE: Fetched page [0x06] from address [0x06].
+[Thread: 0x7f31e17c4640] - [UTC: 19-04-2024 19-33-01] - Device vCPU(2) - TRACE: Fetched page [0x07] from address [0x07].
+[Thread: 0x7f31e17c4640] - [UTC: 19-04-2024 19-33-13] - Device vCPU(2) - TRACE: Fetched page [0x08] from address [0x08].
+[Thread: 0x7f31e17c4640] - [UTC: 19-04-2024 19-33-22] - Device vCPU(2) - TRACE: Fetched page [0x09] from address [0x09].
+[Thread: 0x7f31e17c4640] - [UTC: 19-04-2024 19-33-31] - Device vCPU(2) - TRACE: Fetched page [0x0a] from address [0x0a].
+[Thread: 0x7f31e17c4640] - [UTC: 19-04-2024 19-33-40] - Device vCPU(2) - TRACE: Fetched page [0x0b] from address [0x0b].
+[Thread: 0x7f31e17c4640] - [UTC: 19-04-2024 19-33-49] - Device vCPU(2) - TRACE: Fetched page [0x0c] from address [0x0c].
+[Thread: 0x7f31e17c4640] - [UTC: 19-04-2024 19-33-58] - Device vCPU(2) - TRACE: Fetched page [0x0d] from address [0x0d].
