@@ -15,4 +15,44 @@
 
 typedef uint8_t REGISTER_t;
 
+union vCPU_CONTROL_REGISTER
+{
+    struct
+    {
+        uint8_t halt_exec : 1;
+        uint8_t : 7;
+    };
+    REGISTER_t control_register;
+};
+typedef union vCPU_CONTROL_REGISTER vCPU_CONTROL_REGISTER_t;
+
+union GP_REGISTERS
+{
+    struct
+    {
+        REGISTER_t R0;
+        REGISTER_t R1;
+        REGISTER_t R2;
+        REGISTER_t R3;
+    };
+    REGISTER_t registers[4];
+};
+typedef union GP_REGISTERS GP_REGISTERS_t;
+
+union SPECIAL_REGISTERS
+{
+    struct
+    {
+        REGISTER_t PC;
+        REGISTER_t LR;
+        REGISTER_t SP;
+        REGISTER_t IR;
+        REGISTER_t MAR;
+        REGISTER_t MDR;
+        vCPU_CONTROL_REGISTER_t CTL;
+    };
+    REGISTER_t registers[7];
+};
+typedef union SPECIAL_REGISTERS SPECIAL_REGISTERS_t;
+
 #endif

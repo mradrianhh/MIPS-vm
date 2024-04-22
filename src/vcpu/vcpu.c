@@ -25,8 +25,8 @@ int vcpu_init(vCPU_t *vcpu)
     log_info(&vcpu->logger, "Initializing.\n");
 
     registers_init(vcpu);
-    vmemory_controller_init(&vcpu->vmemory_controller);
-    vcontrol_unit_init(&vcpu->vcontrol_unit);
+    vmemory_controller_init(&vcpu->vmemory_controller, &vcpu->special_registers.MAR, &vcpu->special_registers.MDR);
+    vcontrol_unit_init(&vcpu->vcontrol_unit, &vcpu->gp_registers, &vcpu->special_registers, &vcpu->vmemory_controller);
 
     return 0;
 }
@@ -58,14 +58,16 @@ static void *vcpu_loop(void *vargp)
 
     log_info(&vcpu->logger, "Running on thread [0x%016lx].\n", vcpu->device_info->device_tid);
 
-    while (vcpu->device_info->device_running)
+    while (vcpu->device_info->device_running && !vcpu->special_registers.CTL.halt_exec)
     {
         log_trace(&vcpu->logger, "CYCLE START.\n");
+        log_trace(&vcpu->vcontrol_unit.logger, "CYCLE START.\n");
+        log_trace(&vcpu->vmemory_controller.logger, "CYCLE START.\n");
 
         log_trace(&vcpu->logger, "Calling %s(%d) to fetch next instruction.\n",
                   convert_device_type_str(vcpu->vcontrol_unit.device_info->device_type),
                   vcpu->vcontrol_unit.device_info->device_id);
-        fetch_instruction(&vcpu->vcontrol_unit, &vcpu->vmemory_controller);
+        fetch_instruction(&vcpu->vcontrol_unit);
 
         log_trace(&vcpu->logger, "Calling %s(%d) to decode instruction.\n",
                   convert_device_type_str(vcpu->vcontrol_unit.device_info->device_type),
@@ -76,10 +78,13 @@ static void *vcpu_loop(void *vargp)
                   convert_device_type_str(vcpu->vcontrol_unit.device_info->device_type),
                   vcpu->vcontrol_unit.device_info->device_id);
         execute_instruction(&vcpu->vcontrol_unit);
+
         log_trace(&vcpu->logger, "CYCLE END.\n");
+        log_trace(&vcpu->vcontrol_unit.logger, "CYCLE END.\n");
+        log_trace(&vcpu->vmemory_controller.logger, "CYCLE END.\n");
 
         check_interrupt(vcpu);
-        //sleep(3);
+        sleep(1);
     }
 
     pthread_exit(NULL);
@@ -94,22 +99,13 @@ void registers_dump(vCPU_t *vcpu)
     printf("R1:  [0x%02x]\n", vcpu->gp_registers.R1);
     printf("R2:  [0x%02x]\n", vcpu->gp_registers.R2);
     printf("R3:  [0x%02x]\n", vcpu->gp_registers.R3);
-    printf("R4:  [0x%02x]\n", vcpu->gp_registers.R4);
-    printf("R5:  [0x%02x]\n", vcpu->gp_registers.R5);
-    printf("R6:  [0x%02x]\n", vcpu->gp_registers.R6);
-    printf("R7:  [0x%02x]\n", vcpu->gp_registers.R7);
-    printf("R8:  [0x%02x]\n", vcpu->gp_registers.R8);
-    printf("R9:  [0x%02x]\n", vcpu->gp_registers.R9);
-    printf("R10: [0x%02x]\n", vcpu->gp_registers.R10);
-    printf("R11: [0x%02x]\n", vcpu->gp_registers.R11);
-    printf("R12: [0x%02x]\n", vcpu->gp_registers.R12);
-    printf("ACC: [0x%02x]\n", vcpu->ACC);
-    printf("MAR: [0x%02x]\n", vcpu->vmemory_controller.mc_registers.MAR);
-    printf("MDR: [0x%02x]\n", vcpu->vmemory_controller.mc_registers.MDR);
-    printf("PC:  [0x%02x]\n", vcpu->vcontrol_unit.cu_registers.PC);
-    printf("LR:  [0x%02x]\n", vcpu->vcontrol_unit.cu_registers.LR);
-    printf("SP:  [0x%02x]\n", vcpu->vcontrol_unit.cu_registers.SP);
-    printf("INSN: [0x%02x]\n", vcpu->vcontrol_unit.cu_registers.IR);
+    printf("MAR: [0x%02x]\n", vcpu->special_registers.MAR);
+    printf("MDR: [0x%02x]\n", vcpu->special_registers.MDR);
+    printf("PC:  [0x%02x]\n", vcpu->special_registers.PC);
+    printf("LR:  [0x%02x]\n", vcpu->special_registers.LR);
+    printf("SP:  [0x%02x]\n", vcpu->special_registers.SP);
+    printf("INSN: [0x%02x]\n", vcpu->special_registers.IR);
+    printf("CTL: [0x%02x]\n", vcpu->special_registers.CTL);
 
     char input;
     scanf("Press any key to continue. . . %c", &input);
@@ -124,5 +120,5 @@ static void registers_init(vCPU_t *vcpu)
 {
     log_trace(&vcpu->logger, "Initializing registers.\n");
     memset(&vcpu->gp_registers, 0, sizeof(vcpu->gp_registers));
-    vcpu->ACC = 0;
+    memset(&vcpu->special_registers, 0, sizeof(vcpu->special_registers));
 }

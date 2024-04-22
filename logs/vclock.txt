@@ -1,4 +1,4 @@
-[Thread: 0x0000000000000000] - [UTC: 21-04-2024 17-36-57] - Device vCLOCK(5) - INFO: Initializing.
-[Thread: 0x0000000000000000] - [UTC: 21-04-2024 17-36-57] - Device vCLOCK(5) - INFO: Starting.
-[Thread: 0x00007fd13d957640] - [UTC: 21-04-2024 17-36-57] - Device vCLOCK(5) - INFO: Running on thread [0x00007fd13d957640].
-[Thread: 0x00007fd13d957640] - [UTC: 21-04-2024 17-37-01] - Device vCLOCK(5) - INFO: Shutting down.
+[Thread: 0x0000000000000000] - [UTC: 22-04-2024 18-02-55] - Device vCLOCK(5) - INFO: Initializing.
+[Thread: 0x0000000000000000] - [UTC: 22-04-2024 18-02-55] - Device vCLOCK(5) - INFO: Starting.
+[Thread: 0x00007faa39372640] - [UTC: 22-04-2024 18-02-55] - Device vCLOCK(5) - INFO: Running on thread [0x00007faa39372640].
+[Thread: 0x00007faa39372640] - [UTC: 22-04-2024 18-03-54] - Device vCLOCK(5) - INFO: Shutting down.

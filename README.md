@@ -31,6 +31,12 @@ The machine has 4 GPRs(r0-r3), PC, LR, SP, IR, MAR, MDR.
 - [x] Allocate registers per vCPU in host RAM.
 - [x] Create a dedicated CPU thread per vCPU.
 
+### vCPU Fetch-Decode-Execute Cycle
+
+- [x] Implement instruction fetch.
+- [ ] Implement instruction decoding.
+- [ ] Implement instruction execution.
+
 ## vCPU Start-up flow
 
 On reset, all registers are zeroed out. In doing so, the PC also points at memory location 0x00 where the reset handler is stored.

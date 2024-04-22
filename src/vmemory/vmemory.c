@@ -85,7 +85,7 @@ static void *vmemory_loop(void *vargp)
     while (1)
     {
         poll_vmemorybus(vmemory);
-        //sleep(3);
+        sleep(1);
     }
 
     pthread_exit(NULL);
@@ -153,6 +153,11 @@ static void vmemory_example_load(vMEMORY_t *vmemory)
 {
     for (int i = 0; i < MEMORY_SIZE; i++)
     {
-        vmemory->start[i] = i;
+        vmemory->start[i] = 0;
+    }
+
+    for (int i = 0; i < 5; i++)
+    {
+        vmemory->start[i] = i << 4;
     }
 }

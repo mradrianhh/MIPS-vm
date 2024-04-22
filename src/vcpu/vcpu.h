@@ -7,33 +7,18 @@
 #include "logger/logger.h"
 #include "vregisters.h"
 #include "vcontrol_unit.h"
-
-struct GP_REGISTERS
-{
-    REGISTER_t R0;
-    REGISTER_t R1;
-    REGISTER_t R2;
-    REGISTER_t R3;
-    REGISTER_t R4;
-    REGISTER_t R5;
-    REGISTER_t R6;
-    REGISTER_t R7;
-    REGISTER_t R8;
-    REGISTER_t R9;
-    REGISTER_t R10;
-    REGISTER_t R11;
-    REGISTER_t R12;
-};
-typedef struct GP_REGISTERS GP_REGISTERS_t;
+#include "vcu_decoding.h"
 
 struct vCPU
 {
     LOGGER_t logger;
     DEVICE_TABLE_ENTRY_t *device_info;
     GP_REGISTERS_t gp_registers;
-    REGISTER_t ACC;
+    SPECIAL_REGISTERS_t special_registers;
     vCONTROL_UNIT_t vcontrol_unit;
     vMEMORY_CONTROLLER_t vmemory_controller;
+    vCPU_INSN_DECODING_t insn_decoding;
+    vCPU_INSN_DECODING_MAP_t decoding_map;
 };
 typedef struct vCPU vCPU_t;
 

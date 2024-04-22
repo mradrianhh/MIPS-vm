@@ -7,7 +7,7 @@
 #include "vmemory/vmemorybus.h"
 #include "device_table/device_table.h"
 
-int vmemory_controller_init(vMEMORY_CONTROLLER_t *controller)
+int vmemory_controller_init(vMEMORY_CONTROLLER_t *controller, REGISTER_t *MAR, REGISTER_t *MDR)
 {
     controller->device_info = device_table_add(DEVICE_TYPE_MEMORY_CONTROLLER);
 
@@ -17,6 +17,8 @@ int vmemory_controller_init(vMEMORY_CONTROLLER_t *controller)
 
     log_info(&controller->logger, "Initializing.\n");
     
+    controller->MAR = MAR;
+    controller->MDR = MDR;
     vmemorybus_init();
 
     return 0;
@@ -36,7 +38,7 @@ int vmemory_controller_fetch_page(vMEMORY_CONTROLLER_t *controller)
 
     vMEMORYBUS_PACKETS_t packets = {
         .data = 0,
-        .access = controller->mc_registers.MAR,
+        .access = *controller->MAR,
         .control.access_op = vMEMORYBUS_CONTROL_READ,
         .control.unit_used = vMEMORYBUS_CONTROL_USED,
     };
@@ -57,6 +59,6 @@ int vmemory_controller_fetch_page(vMEMORY_CONTROLLER_t *controller)
     log_trace(&controller->logger, "Package {Data: 0x%02x Access: 0x%02x Control: 0x%02x} read from vMEMORYBUS_OUT.\n",
               packets.data, packets.access, packets.control.control_field);
 
-    controller->mc_registers.MDR = packets.data;
+    *controller->MDR = packets.data;
     return 0;
 }
