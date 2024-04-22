@@ -40,7 +40,7 @@ static void *vclock_loop(void *vargp)
 {
     vCLOCK_t *vclock = (vCLOCK_t *)vargp;
 
-    log_info(&vclock->logger, "Running on thread [0x%08lx].\n", vclock->device_info->device_tid);
+    log_info(&vclock->logger, "Running on thread [0x%016lx].\n", vclock->device_info->device_tid);
 
     while (vclock->device_info->device_running)
     {

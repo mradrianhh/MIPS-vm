@@ -117,6 +117,9 @@ char *convert_device_type_str(uint8_t device_type)
     case DEVICE_TYPE_MEMORY:
         ret = "vMEMORY";
         break;
+    case DEVICE_TYPE_CONTROL_UNIT:
+        ret = "vCONTROL_UNIT";
+        break;
     default:
         ret = "";
         break;
@@ -136,4 +139,7 @@ void device_table_dump()
         printf("[%p] : { Device ID: %d Device Type: %s Running: %d } \n", (void *)&device_table.start[i], device_table.start[i].device_id, convert_device_type_str(device_table.start[i].device_type), device_table.start[i].device_running);
     }
     pthread_mutex_unlock(&device_table.mutex);
+
+    char input;
+    scanf("Press any key to continue. . . %c", &input);
 }

@@ -3,12 +3,14 @@
 #include <stdint.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #include "vcpu/vcpu.h"
 #include "vclock/vclock.h"
 #include "vmemory/vmemory.h"
 #include "device_table/device_table.h"
-#include "vsysbus/vsysbus.h"
+
+#define FLUSH while (getchar() != '\n')
 
 static void init();
 static void start();
@@ -16,7 +18,6 @@ static void shutdown();
 
 static int rc;
 static char input;
-static int running;
 
 static vCPU_t vcpu;
 static vMEMORY_t vmemory;
@@ -28,10 +29,11 @@ int main()
 
     start();
 
-    scanf("%c", &input);
+    printf("Press any key to quit. . . ");
+    scanf(" %c", &input);
     shutdown();
-    printf("Terminating. . .\n");
-    pthread_exit(NULL);
+
+    return 0;
 }
 
 void init()
@@ -81,6 +83,7 @@ void start()
         printf("Error: vclock_start() returned with rc=%d", rc);
         exit(1);
     }
+
 }
 
 void shutdown()

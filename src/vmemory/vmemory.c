@@ -67,6 +67,9 @@ void memory_dump(vMEMORY_t *vmemory)
         printf(" [0x%02x] ", vmemory->start[i]);
     }
     printf("\n");
+    
+    char input;
+    scanf("Press any key to continue. . . %c", &input);
 }
 
 ///
@@ -76,10 +79,13 @@ void memory_dump(vMEMORY_t *vmemory)
 static void *vmemory_loop(void *vargp)
 {
     vMEMORY_t *vmemory = (vMEMORY_t *)vargp;
+
+    log_info(&vmemory->logger, "Running on thread [0x%016lx].\n", vmemory->device_info->device_tid);
+
     while (1)
     {
         poll_vmemorybus(vmemory);
-        sleep(3);
+        //sleep(3);
     }
 
     pthread_exit(NULL);

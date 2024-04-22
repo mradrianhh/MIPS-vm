@@ -1,33 +1,37 @@
 # 8-bit VM
 
-# Specifications
+## Specifications
 
 - 1 byte page size.
 - 1 byte word size.
 - 1 byte instruction size.
 - Allows a maximum of 256 bytes of addressable memory.
 
-# Registers
+## Registers
 
-The machine has 13 GRPs, plus PC, LR and SP.
+The machine has 4 GPRs(r0-r3), PC, LR, SP, IR, MAR, MDR.
 
-- r0..r12: general purpose registers(GPR).
-- r13: program counter(PC).
-- r14: link register(LR).
-- r15: stack pointer(SP).
+## Instruction Set Architecture
 
-# Instruction Set Architecture
+- MOV Rd, Rn ; Move value from Rn to Rd. 0000ddss.
 
-- Immediate Move
-MOV r0, #1 ; Move immediate value 1 to register r0.
+- MOV Rd, #immed ; Move #immed to Rd. 0001ddss.
 
-# Tasks and planning
+- LDR Rd, [Rn{, #offset}] ; Read word from address Rn + #offset, and store the value in Rd.
 
-- Allocate a virtual address space to hold the guest memory in host RAM.
-- Allocate registers per vCPU in host RAM.
-- Create a dedicated CPU thread per vCPU.
+- STR Rd, [Rn{, #offset}] ; Store word from Rd in address Rn + #offset.
 
-# vCPU Start-up flow
+- ADD Rd, Rn, Rm ; Rd = Rn + Rm.
+
+- SUB Rd, Rn, Rm ; Rd = Rn - Rm.
+
+## Tasks and planning
+
+- [x] Allocate a virtual address space to hold the guest memory in host RAM.
+- [x] Allocate registers per vCPU in host RAM.
+- [x] Create a dedicated CPU thread per vCPU.
+
+## vCPU Start-up flow
 
 On reset, all registers are zeroed out. In doing so, the PC also points at memory location 0x00 where the reset handler is stored.
 While in the reset handler, the vCPU is configuring itself. The reset handler is responsible for copying necessary data from ROM into RAM and initializing the context before handing over control to the application program.
@@ -36,13 +40,13 @@ Currently, there is no concept of priviliged or unprivileged tasks, meaning that
 
 No worries, just reset the device.
 
-# vCPU execution-loop.
+## vCPU execution-loop.
 
 The vCPU acts as a real-time translator that translates the guest-machine(GM) instructions(INSN) to host-machine(HM) instructions(INSN) that are executed on the host.
 
 Each vCPU has it's own dedicated thread and host-instruction buffer(HIB). The HIB has it's own host-processing controller(HPC) that actually executes the translated HM INSN.
 
-# Host-processing
+## Host-processing
 
 Each vCPU has it's own dedicated HIB, and each HIB has it's own dedicated host-instruction buffer observer(HIBO) and HPC.
 
@@ -54,7 +58,7 @@ When the HIBO notifies the HPC that the HIB is about to run out of space, the HP
 
 When the HPC detects that the HIB is empty, it will decrease it's read frequency. This happens at read intervals, meaning that the HPC will see that the HIB is empty and step down it's read-frequency. If the HIB is still empty the next time it reads, it will step down it's read frequency once more. The minimum read-frequency is 1 hz, meaning that if you halt the vCPU, the HPC is still running, waiting for work.
 
-# Interrupts and exception handling
+## Interrupts and exception handling
 
 Interrupts are handled by the external nested vector interrupt controller(NVIC), and all interrupt handlers has dedicated addresses in the memory space. If those handlers are moved to a different location, the device will fail as the PC will be set to the expected address.
 

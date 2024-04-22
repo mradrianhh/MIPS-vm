@@ -5,20 +5,10 @@
 #include "device_table/device_table.h"
 #include "vmemory_controller.h"
 #include "logger/logger.h"
+#include "vregisters.h"
+#include "vcontrol_unit.h"
 
-#define BIT0 (uint8_t)(0b00000001)
-#define BIT1 (uint8_t)(0b00000010)
-#define BIT2 (uint8_t)(0b00000100)
-#define BIT3 (uint8_t)(0b00001000)
-#define BIT4 (uint8_t)(0b00010000)
-#define BIT5 (uint8_t)(0b00100000)
-#define BIT6 (uint8_t)(0b01000000)
-#define BIT7 (uint8_t)(0b10000000)
-#define BIT(x) ((uint8_t)1 << (x))
-
-typedef uint8_t REGISTER_t;
-
-struct REGISTERS
+struct GP_REGISTERS
 {
     REGISTER_t R0;
     REGISTER_t R1;
@@ -33,22 +23,21 @@ struct REGISTERS
     REGISTER_t R10;
     REGISTER_t R11;
     REGISTER_t R12;
-    REGISTER_t PC;
-    REGISTER_t LR;
-    REGISTER_t SP;
 };
-typedef struct REGISTERS REGISTERS_t;
+typedef struct GP_REGISTERS GP_REGISTERS_t;
 
-struct vCPU {
+struct vCPU
+{
     LOGGER_t logger;
     DEVICE_TABLE_ENTRY_t *device_info;
-    REGISTERS_t registers;
+    GP_REGISTERS_t gp_registers;
+    REGISTER_t ACC;
+    vCONTROL_UNIT_t vcontrol_unit;
     vMEMORY_CONTROLLER_t vmemory_controller;
-    
 };
 typedef struct vCPU vCPU_t;
 
-int vcpu_init(vCPU_t* vcpu);
+int vcpu_init(vCPU_t *vcpu);
 
 int vcpu_start(vCPU_t *vcpu);
 

@@ -16,7 +16,7 @@ int vmemory_controller_init(vMEMORY_CONTROLLER_t *controller)
     logger_init(&controller->logger);
 
     log_info(&controller->logger, "Initializing.\n");
-
+    
     vmemorybus_init();
 
     return 0;
@@ -30,13 +30,13 @@ int vmemory_controller_shutdown(vMEMORY_CONTROLLER_t *controller)
     return 0;
 }
 
-int vmemory_controller_fetch_page(vMEMORY_CONTROLLER_t *controller, uint8_t address, PAGE_t *page)
+int vmemory_controller_fetch_page(vMEMORY_CONTROLLER_t *controller)
 {
     int rc = 0;
 
     vMEMORYBUS_PACKETS_t packets = {
         .data = 0,
-        .access = address,
+        .access = controller->mc_registers.MAR,
         .control.access_op = vMEMORYBUS_CONTROL_READ,
         .control.unit_used = vMEMORYBUS_CONTROL_USED,
     };
@@ -44,8 +44,7 @@ int vmemory_controller_fetch_page(vMEMORY_CONTROLLER_t *controller, uint8_t addr
     rc = vmemorybus_write(vMEMORYBUS_SEL_IN, &packets);
     if (rc)
     {
-        page = NULL;
-        return 0;
+        return 1;
     }
     log_trace(&controller->logger, "Package {Data: 0x%02x Access: 0x%02x Control: 0x%02x} written to vMEMORYBUS_IN.\n",
               packets.data, packets.access, packets.control.control_field);
@@ -54,11 +53,10 @@ int vmemory_controller_fetch_page(vMEMORY_CONTROLLER_t *controller, uint8_t addr
     while (!packets.control.unit_used)
     {
         vmemorybus_read(vMEMORYBUS_SEL_OUT, &packets);
-        sleep(3);
     }
     log_trace(&controller->logger, "Package {Data: 0x%02x Access: 0x%02x Control: 0x%02x} read from vMEMORYBUS_OUT.\n",
               packets.data, packets.access, packets.control.control_field);
 
-    *page = packets.data;
+    controller->mc_registers.MDR = packets.data;
     return 0;
 }

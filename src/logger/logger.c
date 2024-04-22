@@ -72,7 +72,7 @@ static int log_write(LOGGER_t *logger, const char *log_level, const char *format
     time(&timer);
     timer_fmt = gmtime(&timer);
 
-    fprintf(logger->file_pointer, "[Thread: 0x%08lx] - [UTC: %02d-%02d-%04d %02d-%02d-%02d] - Device %s(%d) - %s: ", logger->device_info->device_tid, timer_fmt->tm_mday, (timer_fmt->tm_mon + 1), (timer_fmt->tm_year + 1900),
+    fprintf(logger->file_pointer, "[Thread: 0x%016lx] - [UTC: %02d-%02d-%04d %02d-%02d-%02d] - Device %s(%d) - %s: ", logger->device_info->device_tid, timer_fmt->tm_mday, (timer_fmt->tm_mon + 1), (timer_fmt->tm_year + 1900),
             timer_fmt->tm_hour, timer_fmt->tm_min, timer_fmt->tm_sec,
             convert_device_type_str(logger->device_info->device_type), logger->device_info->device_id, log_level);
     vfprintf(logger->file_pointer, format, args);
