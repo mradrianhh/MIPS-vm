@@ -67,7 +67,7 @@ void memory_dump(vMEMORY_t *vmemory)
         printf(" [0x%02x] ", vmemory->start[i]);
     }
     printf("\n");
-    
+
     char input;
     scanf("Press any key to continue. . . %c", &input);
 }

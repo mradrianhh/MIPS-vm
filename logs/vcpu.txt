@@ -1,35 +1,70 @@
-[Thread: 0x0000000000000000] - [UTC: 22-04-2024 18-02-55] - Device vCPU(2) - INFO: Initializing.
-[Thread: 0x0000000000000000] - [UTC: 22-04-2024 18-02-55] - Device vCPU(2) - TRACE: Initializing registers.
-[Thread: 0x0000000000000000] - [UTC: 22-04-2024 18-02-55] - Device vCPU(2) - INFO: Starting.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-02-55] - Device vCPU(2) - INFO: Running on thread [0x00007faa39b73640].
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-02-55] - Device vCPU(2) - TRACE: CYCLE START.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-02-55] - Device vCPU(2) - TRACE: Calling vCONTROL_UNIT(4) to fetch next instruction.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-02-56] - Device vCPU(2) - TRACE: Calling vCONTROL_UNIT(4) to decode instruction.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-02-56] - Device vCPU(2) - TRACE: Calling vCONTROL_UNIT(4) to execute instruction.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-02-56] - Device vCPU(2) - TRACE: CYCLE END.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-02-56] - Device vCPU(2) - TRACE: No pending interrupts.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-02-57] - Device vCPU(2) - TRACE: CYCLE START.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-02-57] - Device vCPU(2) - TRACE: Calling vCONTROL_UNIT(4) to fetch next instruction.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-02-58] - Device vCPU(2) - TRACE: Calling vCONTROL_UNIT(4) to decode instruction.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-02-58] - Device vCPU(2) - TRACE: Calling vCONTROL_UNIT(4) to execute instruction.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-02-58] - Device vCPU(2) - TRACE: CYCLE END.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-02-58] - Device vCPU(2) - TRACE: No pending interrupts.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-02-59] - Device vCPU(2) - TRACE: CYCLE START.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-02-59] - Device vCPU(2) - TRACE: Calling vCONTROL_UNIT(4) to fetch next instruction.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-00] - Device vCPU(2) - TRACE: Calling vCONTROL_UNIT(4) to decode instruction.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-00] - Device vCPU(2) - TRACE: Calling vCONTROL_UNIT(4) to execute instruction.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-00] - Device vCPU(2) - TRACE: CYCLE END.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-00] - Device vCPU(2) - TRACE: No pending interrupts.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-01] - Device vCPU(2) - TRACE: CYCLE START.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-01] - Device vCPU(2) - TRACE: Calling vCONTROL_UNIT(4) to fetch next instruction.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-02] - Device vCPU(2) - TRACE: Calling vCONTROL_UNIT(4) to decode instruction.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-02] - Device vCPU(2) - TRACE: Calling vCONTROL_UNIT(4) to execute instruction.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-02] - Device vCPU(2) - TRACE: CYCLE END.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-02] - Device vCPU(2) - TRACE: No pending interrupts.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-03] - Device vCPU(2) - TRACE: CYCLE START.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-03] - Device vCPU(2) - TRACE: Calling vCONTROL_UNIT(4) to fetch next instruction.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-04] - Device vCPU(2) - TRACE: Calling vCONTROL_UNIT(4) to decode instruction.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-04] - Device vCPU(2) - TRACE: Calling vCONTROL_UNIT(4) to execute instruction.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-04] - Device vCPU(2) - TRACE: CYCLE END.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-04] - Device vCPU(2) - TRACE: No pending interrupts.
-[Thread: 0x00007faa39b73640] - [UTC: 22-04-2024 18-03-54] - Device vCPU(2) - INFO: Shutting down.
+[Thread: 0x0000000000000000] - [UTC: 22-04-2024 19-25-50] - Device vCPU(2) - INFO: Initializing.
+[Thread: 0x0000000000000000] - [UTC: 22-04-2024 19-25-50] - Device vCPU(2) - TRACE: Initializing registers.
+[Thread: 0x0000000000000000] - [UTC: 22-04-2024 19-25-50] - Device vCPU(2) - INFO: Starting.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-50] - Device vCPU(2) - INFO: Running on thread [0x00007f8f725d3640].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-50] - Device vCPU(2) - TRACE: CYCLE START.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-50] - Device vCPU(2) - TRACE: Fetching instruction at PC value [0x00].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-50] - Device vCPU(2) - TRACE: Moved PC(0x00) to MAR.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-51] - Device vCPU(2) - TRACE: Fetched page [0x00] into MDR from address [0x00].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-51] - Device vCPU(2) - TRACE: Moved MDR(0x00) into IR.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-51] - Device vCPU(2) - TRACE: Incremented PC. New value: [0x01].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-51] - Device vCPU(2) - TRACE: Decoding instruction [0x00].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-51] - Device vCPU(2) - TRACE: Executing instruction [0x00].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-51] - Device vCPU(2) - DEBUG: R0: [0x00] R0: [0x00]
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-51] - Device vCPU(2) - TRACE: ADD R0, R0 ; R0 = R0 + R0.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-51] - Device vCPU(2) - DEBUG: R0: [0x00] R0: [0x00]
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-51] - Device vCPU(2) - TRACE: CYCLE END.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-51] - Device vCPU(2) - TRACE: No pending interrupts.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-52] - Device vCPU(2) - TRACE: CYCLE START.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-52] - Device vCPU(2) - TRACE: Fetching instruction at PC value [0x01].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-52] - Device vCPU(2) - TRACE: Moved PC(0x01) to MAR.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-53] - Device vCPU(2) - TRACE: Fetched page [0x10] into MDR from address [0x01].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-53] - Device vCPU(2) - TRACE: Moved MDR(0x10) into IR.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-53] - Device vCPU(2) - TRACE: Incremented PC. New value: [0x02].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-53] - Device vCPU(2) - TRACE: Decoding instruction [0x10].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-53] - Device vCPU(2) - TRACE: Executing instruction [0x10].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-53] - Device vCPU(2) - DEBUG: R0: [0x00] R0: [0x00]
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-53] - Device vCPU(2) - TRACE: MOV R0, R0 ; R0 = R0.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-53] - Device vCPU(2) - DEBUG: R0: [0x00] R0: [0x00]
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-53] - Device vCPU(2) - TRACE: CYCLE END.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-53] - Device vCPU(2) - TRACE: No pending interrupts.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-54] - Device vCPU(2) - TRACE: CYCLE START.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-54] - Device vCPU(2) - TRACE: Fetching instruction at PC value [0x02].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-54] - Device vCPU(2) - TRACE: Moved PC(0x02) to MAR.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-55] - Device vCPU(2) - TRACE: Fetched page [0x20] into MDR from address [0x02].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-55] - Device vCPU(2) - TRACE: Moved MDR(0x20) into IR.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-55] - Device vCPU(2) - TRACE: Incremented PC. New value: [0x03].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-55] - Device vCPU(2) - TRACE: Decoding instruction [0x20].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-55] - Device vCPU(2) - TRACE: Executing instruction [0x20].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-55] - Device vCPU(2) - TRACE: Moved R0[0x00] to MAR.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-56] - Device vCPU(2) - TRACE: Fetched page [0x00] into MDR from address [0x00].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-56] - Device vCPU(2) - DEBUG: R0: [0x00] R0: [0x00]
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-56] - Device vCPU(2) - TRACE: LDR R0, R0 ; R0 = [R0].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-56] - Device vCPU(2) - DEBUG: R0: [0x00] R0: [0x00]
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-56] - Device vCPU(2) - TRACE: CYCLE END.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-56] - Device vCPU(2) - TRACE: No pending interrupts.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-57] - Device vCPU(2) - TRACE: CYCLE START.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-57] - Device vCPU(2) - TRACE: Fetching instruction at PC value [0x03].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-57] - Device vCPU(2) - TRACE: Moved PC(0x03) to MAR.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-58] - Device vCPU(2) - TRACE: Fetched page [0x30] into MDR from address [0x03].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-58] - Device vCPU(2) - TRACE: Moved MDR(0x30) into IR.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-58] - Device vCPU(2) - TRACE: Incremented PC. New value: [0x04].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-58] - Device vCPU(2) - TRACE: Decoding instruction [0x30].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-58] - Device vCPU(2) - TRACE: Executing instruction [0x30].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-58] - Device vCPU(2) - TRACE: Moved R0[0x00] to MAR.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-58] - Device vCPU(2) - TRACE: Wrote R0[0x00] to MDR.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-58] - Device vCPU(2) - TRACE: LDR R0, R0 ; R0 = [R0].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-58] - Device vCPU(2) - TRACE: CYCLE END.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-58] - Device vCPU(2) - TRACE: No pending interrupts.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-59] - Device vCPU(2) - TRACE: CYCLE START.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-59] - Device vCPU(2) - TRACE: Fetching instruction at PC value [0x04].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-25-59] - Device vCPU(2) - TRACE: Moved PC(0x04) to MAR.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-26-00] - Device vCPU(2) - TRACE: Fetched page [0x40] into MDR from address [0x04].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-26-00] - Device vCPU(2) - TRACE: Moved MDR(0x40) into IR.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-26-00] - Device vCPU(2) - TRACE: Incremented PC. New value: [0x05].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-26-00] - Device vCPU(2) - TRACE: Decoding instruction [0x40].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-26-00] - Device vCPU(2) - TRACE: Executing instruction [0x40].
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-26-00] - Device vCPU(2) - INFO: Halting execution.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-26-00] - Device vCPU(2) - TRACE: CYCLE END.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-26-00] - Device vCPU(2) - TRACE: No pending interrupts.
+[Thread: 0x00007f8f725d3640] - [UTC: 22-04-2024 19-26-04] - Device vCPU(2) - INFO: Shutting down.

@@ -62,3 +62,25 @@ int vmemory_controller_fetch_page(vMEMORY_CONTROLLER_t *controller)
     *controller->MDR = packets.data;
     return 0;
 }
+
+int vmemory_controller_write_page(vMEMORY_CONTROLLER_t *controller)
+{
+    int rc = 0;
+
+    vMEMORYBUS_PACKETS_t packets = {
+        .data = *controller->MDR,
+        .access = *controller->MAR,
+        .control.access_op = vMEMORYBUS_CONTROL_WRITE,
+        .control.unit_used = vMEMORYBUS_CONTROL_USED,
+    };
+
+    rc = vmemorybus_write(vMEMORYBUS_SEL_IN, &packets);
+    if (rc)
+    {
+        return 1;
+    }
+    log_trace(&controller->logger, "Package {Data: 0x%02x Access: 0x%02x Control: 0x%02x} written to vMEMORYBUS_IN.\n",
+              packets.data, packets.access, packets.control.control_field);
+
+    return 0;
+}

@@ -23,4 +23,6 @@ int vmemory_controller_shutdown(vMEMORY_CONTROLLER_t* controller);
 
 int vmemory_controller_fetch_page(vMEMORY_CONTROLLER_t *controller);
 
+int vmemory_controller_write_page(vMEMORY_CONTROLLER_t *controller);
+
 #endif
