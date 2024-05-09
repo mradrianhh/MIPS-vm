@@ -19,9 +19,6 @@ static void init();
 static void start();
 static void shutdown();
 
-static void handle_test(const void *args);
-static void handle_test2(const void *args);
-
 static int rc;
 static char input;
 
