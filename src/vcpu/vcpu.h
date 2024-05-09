@@ -2,10 +2,12 @@
 #define _8BITVM_VCPU_H_
 
 #include <stdint.h>
+
 #include "device_table/device_table.h"
-#include "vmemory_controller.h"
+#include "vmemory_controller/vmemory_controller.h"
 #include "logger/logger.h"
-#include "vregisters.h"
+#include "vregisters/vregisters.h"
+#include "vnvic/interrupt_event.h"
 
 #define OPCODE_MASK         (uint8_t)(0b11110000)
 #define DEST_MASK           (uint8_t)(0b00001100)
@@ -56,6 +58,7 @@ struct vCPU
     GP_REGISTERS_t gp_registers;
     SPECIAL_REGISTERS_t special_registers;
     vMEMORY_CONTROLLER_t vmemory_controller;
+    InterruptEvent_t *interrupt_event;
     vCPU_INSN_DECODING_t insn_decoding;
     vCPU_INSN_DECODING_MAP_t decoding_map;
 };

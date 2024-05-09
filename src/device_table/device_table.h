@@ -12,6 +12,7 @@
 #define DEVICE_TYPE_MEMORY_CONTROLLER   (uint8_t)(0x03)
 #define DEVICE_TYPE_CLOCK               (uint8_t)(0x04)
 #define DEVICE_TYPE_CONTROL_UNIT        (uint8_t)(0x05)
+#define DEVICE_TYPE_NVIC                (uint8_t)(0x06)
 
 #define DEVICE_RUNNING                  1
 #define DEVICE_STOPPED                  0

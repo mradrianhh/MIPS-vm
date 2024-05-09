@@ -3,10 +3,10 @@
 
 #include <stdint.h>
 
-#include "vmemory.h"
+#include "vmemory/vmemory.h"
 #include "device_table/device_table.h"
 #include "logger/logger.h"
-#include "vregisters.h"
+#include "vregisters/vregisters.h"
 
 struct vMEMORY_CONTROLLER 
 {

@@ -107,7 +107,7 @@ int vmemorybus_read(vMEMORYBUS_SEL_t sel, vMEMORYBUS_PACKETS_t *packets)
 static int vmemorybus_read_in(vMEMORYBUS_PACKETS_t *packets)
 {
     pthread_mutex_lock(&(vmemorybus_in.mutex));
-    if (vmemorybus_in.next == vmemorybus_in.start)
+    if (vmemorybus_in.next != vmemorybus_in.start)
     {
         vmemorybus_in.next--;
     }

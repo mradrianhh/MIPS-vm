@@ -4,12 +4,14 @@
 #include <stdint.h>
 #include "device_table/device_table.h"
 #include "logger/logger.h"
+#include "vnvic/interrupt_event.h"
 
 #define MAX_FREQ 255 // hz
 
 struct vCLOCK {
     LOGGER_t logger;
     DEVICE_TABLE_ENTRY_t *device_info;
+    InterruptEvent_t *interrupt_event;
     uint8_t freq; // max frequency: 255 hz
 };
 typedef struct vCLOCK vCLOCK_t;

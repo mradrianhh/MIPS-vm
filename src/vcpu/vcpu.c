@@ -8,10 +8,16 @@
 #include "device_table/device_table.h"
 #include "vsysbus/vsysbus.h"
 #include "vmemory_controller.h"
+#include "vnvic/interrupt_event.h"
+#include "events/events.h"
 
 static void registers_init(vCPU_t *vcpu);
 static void *vcpu_loop(void *vargp);
+
 static void check_interrupt(vCPU_t *vcpu);
+static void handle_interrupts(LOGGER_t *logger, InterruptArgs_t args);
+static void handle_test(LOGGER_t *logger, void *args);
+static void handle_test2(LOGGER_t *logger, void *args);
 
 static void fetch_instruction(vCPU_t *vcpu);
 static void decode_instruction(vCPU_t *vcpu);
@@ -44,6 +50,10 @@ int vcpu_init(vCPU_t *vcpu)
 
     log_info(&vcpu->logger, "Initializing.\n");
 
+    vcpu->interrupt_event = interrupt_event_get();
+    interrupt_event_subscribe(vcpu->interrupt_event, vcpu->device_info->device_id,
+                              &vcpu->logger, handle_interrupts);
+
     registers_init(vcpu);
     vcpu_insn_decoding_map_init(&vcpu->decoding_map);
     vmemory_controller_init(&vcpu->vmemory_controller, &vcpu->special_registers.MAR, &vcpu->special_registers.MDR);
@@ -55,6 +65,8 @@ int vcpu_start(vCPU_t *vcpu)
 {
     log_info(&vcpu->logger, "Starting.\n");
     vcpu->device_info->device_running = DEVICE_RUNNING;
+
+    event_notify("test",(void *)"vcpu");
 
     pthread_create(&vcpu->device_info->device_tid, NULL, vcpu_loop, (void *)vcpu);
 
@@ -71,7 +83,7 @@ int vcpu_shutdown(vCPU_t *vcpu)
     return 0;
 }
 
-static void *vcpu_loop(void *vargp)
+void *vcpu_loop(void *vargp)
 {
     vCPU_t *vcpu = (vCPU_t *)vargp;
 
@@ -111,7 +123,7 @@ void registers_dump(vCPU_t *vcpu)
     printf("LR:  [0x%02x]\n", vcpu->special_registers.LR);
     printf("SP:  [0x%02x]\n", vcpu->special_registers.SP);
     printf("INSN: [0x%02x]\n", vcpu->special_registers.IR);
-    printf("CTL: [0x%02x]\n", vcpu->special_registers.CTL);
+    printf("CTL: [0x%02x]\n", vcpu->special_registers.CTL.control_register);
 
     char input;
     scanf("Press any key to continue. . . %c", &input);
@@ -119,10 +131,27 @@ void registers_dump(vCPU_t *vcpu)
 
 void check_interrupt(vCPU_t *vcpu)
 {
+    // Check register for pending interrupts.
     log_trace(&vcpu->logger, "No pending interrupts.\n");
 }
 
-static void registers_init(vCPU_t *vcpu)
+void handle_interrupts(LOGGER_t *logger, InterruptArgs_t args)
+{
+}
+
+void handle_test(LOGGER_t *logger, void *args)
+{
+    InterruptArgs_t *temp = (InterruptArgs_t *)args;
+    log_event(logger, "Test - Interrupt Code: %d Device ID: %d.\n", temp->interrupt_code, temp->device_id);
+}
+
+void handle_test2(LOGGER_t *logger, void *args)
+{
+    InterruptArgs_t *temp = (InterruptArgs_t *)args;
+    log_event(logger, "Test2 - Interrupt Code: %d Device ID: %d.\n", temp->interrupt_code, temp->device_id);
+}
+
+void registers_init(vCPU_t *vcpu)
 {
     log_trace(&vcpu->logger, "Initializing registers.\n");
     memset(&vcpu->gp_registers, 0, sizeof(vcpu->gp_registers));
@@ -258,7 +287,7 @@ void vcpu_insn_dec_str(vCPU_INSN_DECODING_t *insn_decoding, uint8_t instruction)
 }
 
 void vcpu_insn_str(vCPU_t *vcpu, vCPU_INSN_OPERANDS_t *operands)
-{             
+{
     vcpu->special_registers.MAR = vcpu->gp_registers.registers[operands->operand2];
     log_trace(&vcpu->logger, "Moved R%d[0x%02x] to MAR.\n",
               operands->operand2, vcpu->gp_registers.registers[operands->operand2]);

@@ -87,6 +87,7 @@ This also means that when an interrupt does occur, the NVIC will check the inter
 - IRQ: Interrupt request.
 - ISR: Interrupt service routine. Also known as interrupt handler.
 - IPRI: Interrupt priority.
+- IVT: Interrupt Vector Table.
 - HM: Host-Machine.
 - GM: Guest-Machine.
 - INSN: Instructions.

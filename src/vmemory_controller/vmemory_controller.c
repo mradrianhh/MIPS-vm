@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "vmemory_controller.h"
 #include "vmemory/vmemorybus.h"
@@ -19,7 +18,6 @@ int vmemory_controller_init(vMEMORY_CONTROLLER_t *controller, REGISTER_t *MAR, R
     
     controller->MAR = MAR;
     controller->MDR = MDR;
-    vmemorybus_init();
 
     return 0;
 }

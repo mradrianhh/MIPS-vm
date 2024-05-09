@@ -16,7 +16,7 @@ static PAGE_t vmemory_read(vMEMORY_t *vmemory, uint8_t address);
 static int vmemory_write(vMEMORY_t *vmemory, PAGE_t page, uint8_t address);
 static void vmemory_example_load(vMEMORY_t *vmemory);
 
-int vmemory_init(vMEMORY_t *vmemory)
+int vmemory_init(vMEMORY_t* const vmemory)
 {
     vmemory->device_info = device_table_add(DEVICE_TYPE_MEMORY);
 
@@ -31,10 +31,12 @@ int vmemory_init(vMEMORY_t *vmemory)
 
     vmemory_example_load(vmemory);
 
+    vmemorybus_init();
+
     return 0;
 }
 
-int vmemory_start(vMEMORY_t *vmemory)
+int vmemory_start(vMEMORY_t* const vmemory)
 {
     log_info(&vmemory->logger, "Starting.\n");
     vmemory->device_info->device_running = DEVICE_RUNNING;
@@ -44,7 +46,7 @@ int vmemory_start(vMEMORY_t *vmemory)
     return 0;
 }
 
-int vmemory_shutdown(vMEMORY_t *vmemory)
+int vmemory_shutdown(vMEMORY_t* const vmemory)
 {
     log_info(&vmemory->logger, "Shutting down.\n");
     vmemory->device_info->device_running = DEVICE_STOPPED;
@@ -53,7 +55,7 @@ int vmemory_shutdown(vMEMORY_t *vmemory)
     return 0;
 }
 
-void memory_dump(vMEMORY_t *vmemory)
+void memory_dump(vMEMORY_t* const vmemory)
 {
     printf("*\n");
     printf("* Memory Dump\n");
@@ -76,9 +78,9 @@ void memory_dump(vMEMORY_t *vmemory)
 /// Private
 ///
 
-static void *vmemory_loop(void *vargp)
+static void *vmemory_loop(void* const vargp)
 {
-    vMEMORY_t *vmemory = (vMEMORY_t *)vargp;
+    vMEMORY_t * const vmemory = (vMEMORY_t *)vargp;
 
     log_info(&vmemory->logger, "Running on thread [0x%016lx].\n", vmemory->device_info->device_tid);
 
