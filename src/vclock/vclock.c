@@ -28,8 +28,6 @@ int vclock_start(vCLOCK_t *vclock)
     log_info(&vclock->logger, "Starting.\n");
     vclock->device_info->device_running = DEVICE_RUNNING;
 
-    event_notify("test2", (void *)"vclock");
-
     pthread_create(&(vclock->device_info->device_tid), NULL, vclock_loop, (void *)vclock);
 
     return 0;

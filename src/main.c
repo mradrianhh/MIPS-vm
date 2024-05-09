@@ -33,13 +33,6 @@ int main()
 {
     init();
 
-    event_create("test");
-    event_create("test2");
-
-    event_subscribe("test", handle_test);
-    event_subscribe("test", handle_test2);
-    event_subscribe("test2", handle_test2);
-
     start();
 
     printf("Press any key to quit...\n");
@@ -48,18 +41,6 @@ int main()
     shutdown();
 
     return 0;
-}
-
-void handle_test(const void *args)
-{
-    char *message = (char *)args;
-    printf("Test - %s\n", message);
-}
-
-void handle_test2(const void *args)
-{
-    char *message = (char *)args;
-    printf("Test2 - %s\n", message);
 }
 
 // During init, devices should register with the device_table, create events, and initialize their own fields.

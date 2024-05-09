@@ -66,8 +66,6 @@ int vcpu_start(vCPU_t *vcpu)
     log_info(&vcpu->logger, "Starting.\n");
     vcpu->device_info->device_running = DEVICE_RUNNING;
 
-    event_notify("test",(void *)"vcpu");
-
     pthread_create(&vcpu->device_info->device_tid, NULL, vcpu_loop, (void *)vcpu);
 
     return 0;
