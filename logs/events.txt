@@ -1,0 +1,15 @@
+[UTC: 09-05-2024 09-16-51] - INFO: Initializing.
+[UTC: 09-05-2024 09-16-51] - INFO: Attempting to create event test.
+[UTC: 09-05-2024 09-16-51] - INFO: Create event test. Succeeded - inserted as root.
+[UTC: 09-05-2024 09-16-51] - INFO: Attempting to create event test2.
+[UTC: 09-05-2024 09-16-51] - INFO: Create event test2. Succeeded.
+[UTC: 09-05-2024 09-16-51] - INFO: Attempting to subscribe to event test.
+[UTC: 09-05-2024 09-16-51] - INFO: Subscribe to event test. Succeeded - inserted as root.
+[UTC: 09-05-2024 09-16-51] - INFO: Attempting to subscribe to event test.
+[UTC: 09-05-2024 09-16-51] - INFO: Subscribe to event test. Succeeded.
+[UTC: 09-05-2024 09-16-51] - INFO: Attempting to subscribe to event test2.
+[UTC: 09-05-2024 09-16-51] - INFO: Subscribe to event test2. Succeeded - inserted as root.
+[UTC: 09-05-2024 09-16-51] - INFO: Attempting to trigger event test.
+[UTC: 09-05-2024 09-16-51] - INFO: Trigger event test. Succeeded.
+[UTC: 09-05-2024 09-16-51] - INFO: Attempting to trigger event test2.
+[UTC: 09-05-2024 09-16-51] - INFO: Trigger event test2. Succeeded.

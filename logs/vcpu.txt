@@ -1,0 +1,19 @@
+[Thread: 0x0000000000000000] - [UTC: 09-05-2024 09-16-51] - Device vCPU(2) - INFO: Initializing.
+[Thread: 0x0000000000000000] - [UTC: 09-05-2024 09-16-51] - Device vCPU(2) - TRACE: Device (2) subscribed to interrupt event.
+[Thread: 0x0000000000000000] - [UTC: 09-05-2024 09-16-51] - Device vCPU(2) - TRACE: Initializing registers.
+[Thread: 0x0000000000000000] - [UTC: 09-05-2024 09-16-51] - Device vCPU(2) - INFO: Starting.
+[Thread: 0x00007f915a745640] - [UTC: 09-05-2024 09-16-51] - Device vCPU(2) - INFO: Running on thread [0x00007f915a745640].
+[Thread: 0x00007f915a745640] - [UTC: 09-05-2024 09-16-51] - Device vCPU(2) - TRACE: CYCLE START.
+[Thread: 0x00007f915a745640] - [UTC: 09-05-2024 09-16-51] - Device vCPU(2) - TRACE: Fetching instruction at PC value [0x00].
+[Thread: 0x00007f915a745640] - [UTC: 09-05-2024 09-16-51] - Device vCPU(2) - TRACE: Moved PC(0x00) to MAR.
+[Thread: 0x00007f915a745640] - [UTC: 09-05-2024 09-16-52] - Device vCPU(2) - TRACE: Fetched page [0x00] into MDR from address [0x00].
+[Thread: 0x00007f915a745640] - [UTC: 09-05-2024 09-16-52] - Device vCPU(2) - TRACE: Moved MDR(0x00) into IR.
+[Thread: 0x00007f915a745640] - [UTC: 09-05-2024 09-16-52] - Device vCPU(2) - TRACE: Incremented PC. New value: [0x01].
+[Thread: 0x00007f915a745640] - [UTC: 09-05-2024 09-16-52] - Device vCPU(2) - TRACE: Decoding instruction [0x00].
+[Thread: 0x00007f915a745640] - [UTC: 09-05-2024 09-16-52] - Device vCPU(2) - TRACE: Executing instruction [0x00].
+[Thread: 0x00007f915a745640] - [UTC: 09-05-2024 09-16-52] - Device vCPU(2) - DEBUG: R0: [0x00] R0: [0x00]
+[Thread: 0x00007f915a745640] - [UTC: 09-05-2024 09-16-52] - Device vCPU(2) - TRACE: ADD R0, R0 ; R0 = R0 + R0.
+[Thread: 0x00007f915a745640] - [UTC: 09-05-2024 09-16-52] - Device vCPU(2) - DEBUG: R0: [0x00] R0: [0x00]
+[Thread: 0x00007f915a745640] - [UTC: 09-05-2024 09-16-52] - Device vCPU(2) - TRACE: CYCLE END.
+[Thread: 0x00007f915a745640] - [UTC: 09-05-2024 09-16-52] - Device vCPU(2) - TRACE: No pending interrupts.
+[Thread: 0x00007f915a745640] - [UTC: 09-05-2024 09-16-52] - Device vCPU(2) - INFO: Shutting down.

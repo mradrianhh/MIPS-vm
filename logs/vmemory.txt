@@ -1,0 +1,7 @@
+[Thread: 0x0000000000000000] - [UTC: 09-05-2024 09-16-51] - Device vMEMORY(1) - INFO: Initializing.
+[Thread: 0x0000000000000000] - [UTC: 09-05-2024 09-16-51] - Device vMEMORY(1) - INFO: Starting.
+[Thread: 0x00007f915af46640] - [UTC: 09-05-2024 09-16-51] - Device vMEMORY(1) - INFO: Running on thread [0x00007f915af46640].
+[Thread: 0x00007f915af46640] - [UTC: 09-05-2024 09-16-52] - Device vMEMORY(1) - TRACE: Package {Data: 0x00 Access: 0x00 Control 0x03} read from vMEMORYBUS_IN.
+[Thread: 0x00007f915af46640] - [UTC: 09-05-2024 09-16-52] - Device vMEMORY(1) - TRACE: Read from vMEMORY. [0x5652d2176750]: [0x00].
+[Thread: 0x00007f915af46640] - [UTC: 09-05-2024 09-16-52] - Device vMEMORY(1) - TRACE: Package {Data: 0x00 Access: 0x00 Control 0x01} written to vMEMORYBUS_OUT.
+[Thread: 0x00007f915af46640] - [UTC: 09-05-2024 09-16-52] - Device vMEMORY(1) - INFO: Shutting down.

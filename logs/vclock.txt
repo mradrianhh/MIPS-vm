@@ -1,0 +1,4 @@
+[Thread: 0x0000000000000000] - [UTC: 09-05-2024 09-16-51] - Device vCLOCK(4) - INFO: Initializing.
+[Thread: 0x0000000000000000] - [UTC: 09-05-2024 09-16-51] - Device vCLOCK(4) - INFO: Starting.
+[Thread: 0x00007f9159f44640] - [UTC: 09-05-2024 09-16-51] - Device vCLOCK(4) - INFO: Running on thread [0x00007f9159f44640].
+[Thread: 0x00007f9159f44640] - [UTC: 09-05-2024 09-16-52] - Device vCLOCK(4) - INFO: Shutting down.
