@@ -1,18 +1,10 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <pthread.h>
 #include <unistd.h>
-#include <ctype.h>
 
-#define FLUSH while (getchar() != '\n')
-
-static void init();
-static void start();
-static void shutdown();
-
-static int rc;
-static char input;
+#include "internal/events/events.h"
+#include "internal/device_table/device_table.h"
+#include "devices/vcpu/vcpu.h"
 
 int main()
 {
@@ -21,8 +13,27 @@ int main()
     // All other devices, has a function subscribed to this event that gets triggered at each tick.
     // This way, everything happens synchronously, and we're able to 
     // emulate the nature of a computer.
-    printf("Press any key to quit...\n");
-    scanf(" %c", &input);
+    device_table_init();    
+    events_init();
+
+    event_create("init");
+    event_create("update");
+    event_create("shutdown");
+
+    event_subscribe("init", vcpu_init);
+    event_subscribe("update", vcpu_update);
+    event_subscribe("shutdown", vcpu_shutdown);
+
+    event_notify("init", NULL);
+
+    int i = 0;
+    while(i < 5){
+        event_notify("update", NULL);
+        sleep(3);
+        i++;
+    }
+
+    event_notify("shutdown", NULL);
 
     return 0;
 }

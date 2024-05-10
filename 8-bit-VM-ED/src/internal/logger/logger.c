@@ -6,7 +6,7 @@
 #include "logger.h"
 
 static int log_write(const LOGGER_t *logger, const char *log_level, const char *format, va_list args);
-static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t _mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int logger_init(LOGGER_t *logger)
 {
@@ -17,7 +17,6 @@ int logger_init(LOGGER_t *logger)
         return 1;
     }
 
-    pthread_mutex_init(&logger->mutex, NULL);
     return 0;
 }
 
@@ -25,9 +24,7 @@ int log_error(const LOGGER_t *logger, const char *format, ...)
 {
     va_list args;
     va_start(args, format);
-    pthread_mutex_lock(&logger->mutex);
     log_write(logger, "ERROR", format, args);
-    pthread_mutex_unlock(&logger->mutex);
     va_end(args);
 
     return 0;
@@ -37,9 +34,7 @@ int log_event(const LOGGER_t *logger, const char *format, ...)
 {
     va_list args;
     va_start(args, format);
-    pthread_mutex_lock(&logger->mutex);
     log_write(logger, "EVENT", format, args);
-    pthread_mutex_unlock(&logger->mutex);
     va_end(args);
 
     return 0;
@@ -49,9 +44,7 @@ int log_info(const LOGGER_t * logger, const char *format, ...)
 {
     va_list args;
     va_start(args, format);
-    pthread_mutex_lock(&logger->mutex);
     log_write(logger, "INFO", format, args);
-    pthread_mutex_unlock(&logger->mutex);
     va_end(args);
 
     return 0;
@@ -61,9 +54,7 @@ int log_debug(const LOGGER_t *logger, const char *format, ...)
 {
     va_list args;
     va_start(args, format);
-    pthread_mutex_lock(&logger->mutex);
     log_write(logger, "DEBUG", format, args);
-    pthread_mutex_unlock(&logger->mutex);
     va_end(args);
 
     return 0;
@@ -73,9 +64,7 @@ int log_trace(const LOGGER_t *logger, const char *format, ...)
 {
     va_list args;
     va_start(args, format);
-    pthread_mutex_lock(&logger->mutex);
     log_write(logger, "TRACE", format, args);
-    pthread_mutex_unlock(&logger->mutex);
     va_end(args);
 
     return 0;
@@ -88,6 +77,7 @@ int logger_shutdown(LOGGER_t *logger)
 
 static int log_write(const LOGGER_t *logger, const char *log_level, const char *format, va_list args)
 {
+    pthread_mutex_lock(&_mutex);
     int rc = 0;
 
     struct tm *timer_fmt;
@@ -111,6 +101,7 @@ static int log_write(const LOGGER_t *logger, const char *log_level, const char *
     }
 
     fflush(logger->file_pointer);
+    pthread_mutex_unlock(&_mutex);
 
     return 0;
 }

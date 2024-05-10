@@ -29,7 +29,7 @@ CC = gcc
 
 # The final build step.
 $(BUILD_DIRS)/$(TARGET_EXEC): $(OBJS)
-	$(CC) $(OBJS) -o $@ $(LDFLAGS) -g
+	$(CC) $(OBJS) -o $@ -g
 
 # Build step for C source
 $(BUILD_DIRS)/%.c.o: %.c
