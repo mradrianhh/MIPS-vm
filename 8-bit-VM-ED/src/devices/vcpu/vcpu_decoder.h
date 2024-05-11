@@ -113,6 +113,7 @@ struct vCPU_INSN_OPERANDS
 
 struct vCPU_INSN
 {
+    REGISTER_t ir;
     vcpu_insn_execute_t execute;
     vCPU_INSN_OPERANDS_t operands;
 };

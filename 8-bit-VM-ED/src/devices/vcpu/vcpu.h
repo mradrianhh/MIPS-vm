@@ -7,11 +7,11 @@
 
 typedef struct vCPU vCPU_t;
 
-void vcpu_init(const void *args);
+void vcpu_init();
 
 void vcpu_update(const void *args);
 
-void vcpu_shutdown(const void *args);
+void vcpu_shutdown();
 
 void vcpu_dump_state();
 

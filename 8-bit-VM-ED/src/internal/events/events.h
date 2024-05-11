@@ -35,7 +35,9 @@ struct _EventSubscription
     event_handler _handler;
 };
 
-int events_init();
+void events_init();
+
+void events_shutdown();
 
 int event_create(const char *event_name);
 

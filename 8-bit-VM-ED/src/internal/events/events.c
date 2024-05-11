@@ -8,7 +8,7 @@ static _EventTable_t _event_table;
 static int find_event(_Event_t **event, const char *event_name);
 
 // Initialize event_table and logger.
-int events_init()
+void events_init()
 {
     _event_table._logger.device_info = NULL;
     _event_table._logger.file_name = "../logs/events.txt";
@@ -17,6 +17,12 @@ int events_init()
 
     _event_table._root_event = NULL;
     pthread_mutex_init(&_event_table._mutex, NULL);
+}
+
+void events_shutdown()
+{
+    log_info(&_event_table._logger, "Shutting down.\n");
+    logger_shutdown(&_event_table._logger);
 }
 
 // Creates event with event_name.

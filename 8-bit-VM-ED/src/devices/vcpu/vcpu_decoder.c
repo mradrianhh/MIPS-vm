@@ -42,6 +42,7 @@ vCPU_INSN_t vcpu_insn_decode_nop(uint8_t instruction)
     vcpu_insn.execute = _executer_map.executers[NOP];
     vcpu_insn.operands.operand1 = (instruction & DEST_MASK) >> 2;
     vcpu_insn.operands.operand2 = (instruction & SOURCE_MASK);
+    vcpu_insn.ir = instruction;
     return vcpu_insn;
 }
 
@@ -51,6 +52,7 @@ vCPU_INSN_t vcpu_insn_decode_add(uint8_t instruction)
     vcpu_insn.execute = _executer_map.executers[ADD];
     vcpu_insn.operands.operand1 = (instruction & DEST_MASK) >> 2;
     vcpu_insn.operands.operand2 = (instruction & SOURCE_MASK);
+    vcpu_insn.ir = instruction;
     return vcpu_insn;
 }
 
@@ -60,6 +62,7 @@ vCPU_INSN_t vcpu_insn_decode_mov(uint8_t instruction)
     vcpu_insn.execute = _executer_map.executers[MOV];
     vcpu_insn.operands.operand1 = (instruction & DEST_MASK) >> 2;
     vcpu_insn.operands.operand2 = (instruction & SOURCE_MASK);
+    vcpu_insn.ir = instruction;
     return vcpu_insn;
 }
 
@@ -69,6 +72,7 @@ vCPU_INSN_t vcpu_insn_decode_ldr(uint8_t instruction)
     vcpu_insn.execute = _executer_map.executers[LDR];
     vcpu_insn.operands.operand1 = (instruction & DEST_MASK) >> 2;
     vcpu_insn.operands.operand2 = (instruction & SOURCE_MASK);
+    vcpu_insn.ir = instruction;
     return vcpu_insn;
 }
 
@@ -78,5 +82,6 @@ vCPU_INSN_t vcpu_insn_decode_str(uint8_t instruction)
     vcpu_insn.execute = _executer_map.executers[STR];
     vcpu_insn.operands.operand1 = (instruction & DEST_MASK) >> 2;
     vcpu_insn.operands.operand2 = (instruction & SOURCE_MASK);
+    vcpu_insn.ir = instruction;
     return vcpu_insn;
 }

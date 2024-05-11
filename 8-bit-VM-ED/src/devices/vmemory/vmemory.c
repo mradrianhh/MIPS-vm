@@ -9,7 +9,7 @@ static void vmemory_example_load();
 
 static vMEMORY_t vmemory;
 
-void vmemory_init(const void *args)
+void vmemory_init()
 {
     vmemory.device_info = device_table_add(DEVICE_TYPE_MEMORY);
 
@@ -25,7 +25,7 @@ void vmemory_init(const void *args)
     vmemory_example_load();
 }
 
-void vmemory_shutdown(const void *args)
+void vmemory_shutdown()
 {
     log_info(&vmemory.logger, "Shutting down.\n");
     logger_shutdown(&vmemory.logger);

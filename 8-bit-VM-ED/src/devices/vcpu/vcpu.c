@@ -10,14 +10,16 @@
 #include "internal/device_table/device_table.h"
 #include "internal/events/events.h"
 #include "devices/vmemory/vmemory.h"
+#include "devices/vclock/EdgeChangedEvent.h"
 
 static vCPU_state_t prev_state;
 static vCPU_t vcpu;
 
 static void init_state();
 static void init_registers(vCPU_state_t *state);
-
 static void dump_registers(vCPU_state_t *state);
+static void handle_rising();
+static void handle_falling();
 
 static vCPU_INSN_EXECUTER_MAP_t init_executer_map();
 static void vcpu_insn_execute_nop(vCPU_INSN_OPERANDS_t operands);
@@ -31,7 +33,7 @@ static void vcpu_insn_execute_str(vCPU_INSN_OPERANDS_t operands);
 // ------------------
 //
 
-void vcpu_init(const void *args)
+void vcpu_init()
 {
     vcpu.device_info = device_table_add(DEVICE_TYPE_CPU);
 
@@ -48,32 +50,17 @@ void vcpu_init(const void *args)
 
 void vcpu_update(const void *args)
 {
-    // Fetch instruction
-    // 1. Load prev-PC into prev-MAR.
-    vcpu.state.special_registers.MAR = prev_state.special_registers.PC;
-    // 2. Memory controller communicates prev-MAR over address bus.
-    // 3. Memory listens on address bus and returns address.
-    // 4. Memory controller places data into MDR.
-    vcpu.state.special_registers.MDR = vmemory_fetch(vcpu.state.special_registers.MAR);
-    // 5. Load MDR into IR.
-    vcpu.state.special_registers.IR = vcpu.state.special_registers.MDR;
-    // 6. Increment prev-PC.
-    vcpu.state.special_registers.PC++;
-
-    // Decode instruction
-    // 1. Decode prev-IR.
-    vcpu.state.decoded_insn = vcpu_decoder_decode(prev_state.special_registers.IR);
-
-    // Execute instruction
-    // 1. Execute prev-INSN.
-    prev_state.decoded_insn.execute(prev_state.decoded_insn.operands);
-
-    vcpu_dump_state();
-    // Move vcpu.state to prev_state.
-    prev_state = vcpu.state;
+    const EdgeChangedEventArgs_t *e = (const EdgeChangedEventArgs_t *)args;
+    if(e->edge)
+    {
+        handle_rising();
+    }
+    else {
+        handle_falling();
+    }
 }
 
-void vcpu_shutdown(const void *args)
+void vcpu_shutdown()
 {
     log_info(&vcpu.logger, "Shutting down.\n");
     logger_shutdown(&vcpu.logger);
@@ -132,6 +119,42 @@ void dump_registers(vCPU_state_t *state)
     log_debug(&vcpu.logger, "\t%-4s:\t[0x%02x]\n", "CTL", state->special_registers.CTL.control_register);
 }
 
+void handle_rising()
+{
+    log_info(&vcpu.logger, ">> CYCLE START.\n");
+    // Fetch instruction
+    // 1. Load prev-PC into prev-MAR.
+    vcpu.state.special_registers.MAR = prev_state.special_registers.PC;
+    // 2. Memory controller communicates prev-MAR over address bus.
+    // 3. Memory listens on address bus and returns address.
+    // 4. Memory controller places data into MDR.
+    vcpu.state.special_registers.MDR = vmemory_fetch(vcpu.state.special_registers.MAR);
+    // 5. Load MDR into IR.
+    vcpu.state.special_registers.IR = vcpu.state.special_registers.MDR;
+    log_info(&vcpu.logger, "Fetch: Instruction [0x%02x] at address [0x%02x](PC).\n",
+             vcpu.state.special_registers.IR, prev_state.special_registers.PC);
+    // 6. Increment prev-PC.
+    vcpu.state.special_registers.PC++;
+
+    // Decode instruction
+    // 1. Decode prev-IR.
+    vcpu.state.decoded_insn = vcpu_decoder_decode(prev_state.special_registers.IR);
+    log_info(&vcpu.logger, "Decode: Instruction [0x%02x].\n", prev_state.special_registers.IR);
+
+    // Execute instruction
+    // 1. Execute prev-INSN.
+    prev_state.decoded_insn.execute(prev_state.decoded_insn.operands);
+    log_info(&vcpu.logger, "Execute: Instruction [0x%02x].\n", prev_state.decoded_insn.ir);
+}
+
+void handle_falling()
+{
+    log_info(&vcpu.logger, ">> CYCLE END.\n");
+    log_info(&vcpu.logger, ">>\n");
+    // Move vcpu.state to prev_state.
+    prev_state = vcpu.state;
+}
+
 vCPU_INSN_EXECUTER_MAP_t init_executer_map()
 {
     vCPU_INSN_EXECUTER_MAP_t map;
@@ -146,25 +169,22 @@ vCPU_INSN_EXECUTER_MAP_t init_executer_map()
 
 void vcpu_insn_execute_nop(vCPU_INSN_OPERANDS_t operands)
 {
-    log_debug(&vcpu.logger, "Executing instruction: nop.\n");
 }
 
 void vcpu_insn_execute_add(vCPU_INSN_OPERANDS_t operands)
 {
-    log_debug(&vcpu.logger, "Executing instruction: add.\n");
+    vcpu.state.gp_registers.registers[operands.operand1] += vcpu.state.gp_registers.registers[operands.operand2];
 }
 
 void vcpu_insn_execute_mov(vCPU_INSN_OPERANDS_t operands)
 {
-    log_debug(&vcpu.logger, "Executing instruction: mov.\n");
+    vcpu.state.gp_registers.registers[operands.operand1] = vcpu.state.gp_registers.registers[operands.operand2];
 }
 
 void vcpu_insn_execute_ldr(vCPU_INSN_OPERANDS_t operands)
 {
-    log_debug(&vcpu.logger, "Executing instruction: ldr.\n");
 }
 
 void vcpu_insn_execute_str(vCPU_INSN_OPERANDS_t operands)
 {
-    log_debug(&vcpu.logger, "Executing instruction: str.\n");
 }

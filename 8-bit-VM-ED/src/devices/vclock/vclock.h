@@ -1,6 +1,9 @@
 #ifndef _8BITVM_VCLOCK_H_
 #define _8BITVM_VCLOCK_H_
+
+#ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 199309L
+#endif
 
 #include <stdint.h>
 #include <time.h>
@@ -16,10 +19,10 @@ struct vCLOCK {
 };
 typedef struct vCLOCK vCLOCK_t;
 
-int vclock_init(vCLOCK_t* vclock);
+void vclock_init(uint8_t freq);
 
-int vclock_start(vCLOCK_t* vclock);
+void vclock_start();
 
-int vclock_shutdown(vCLOCK_t *vclock);
+void vclock_shutdown();
 
 #endif

@@ -20,9 +20,9 @@ struct vMEMORY
 typedef struct vMEMORY vMEMORY_t;
 
 // Initializes virtual memory.
-void vmemory_init(const void *args);
+void vmemory_init();
 
-void vmemory_shutdown(const void *args);
+void vmemory_shutdown();
 
 PAGE_t vmemory_fetch(uint8_t address);
 

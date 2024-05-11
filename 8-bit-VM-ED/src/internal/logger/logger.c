@@ -7,6 +7,7 @@
 
 static int log_write(const LOGGER_t *logger, const char *log_level, const char *format, va_list args);
 static pthread_mutex_t _mutex = PTHREAD_MUTEX_INITIALIZER;
+static LogLevel_t _log_level;
 
 int logger_init(LOGGER_t *logger)
 {
@@ -20,8 +21,19 @@ int logger_init(LOGGER_t *logger)
     return 0;
 }
 
+int set_log_level(LogLevel_t log_level)
+{
+    _log_level = log_level;
+    return 0;
+}
+
 int log_error(const LOGGER_t *logger, const char *format, ...)
 {
+    if (_log_level < LOG_LEVEL_ERROR)
+    {
+        return 0;
+    }
+
     va_list args;
     va_start(args, format);
     log_write(logger, "ERROR", format, args);
@@ -32,6 +44,11 @@ int log_error(const LOGGER_t *logger, const char *format, ...)
 
 int log_event(const LOGGER_t *logger, const char *format, ...)
 {
+    if (_log_level < LOG_LEVEL_EVENT)
+    {
+        return 0;
+    }
+
     va_list args;
     va_start(args, format);
     log_write(logger, "EVENT", format, args);
@@ -40,8 +57,13 @@ int log_event(const LOGGER_t *logger, const char *format, ...)
     return 0;
 }
 
-int log_info(const LOGGER_t * logger, const char *format, ...)
+int log_info(const LOGGER_t *logger, const char *format, ...)
 {
+    if (_log_level < LOG_LEVEL_INFO)
+    {
+        return 0;
+    }
+
     va_list args;
     va_start(args, format);
     log_write(logger, "INFO", format, args);
@@ -52,6 +74,11 @@ int log_info(const LOGGER_t * logger, const char *format, ...)
 
 int log_debug(const LOGGER_t *logger, const char *format, ...)
 {
+    if (_log_level < LOG_LEVEL_DEBUG)
+    {
+        return 0;
+    }
+
     va_list args;
     va_start(args, format);
     log_write(logger, "DEBUG", format, args);
@@ -62,6 +89,11 @@ int log_debug(const LOGGER_t *logger, const char *format, ...)
 
 int log_trace(const LOGGER_t *logger, const char *format, ...)
 {
+    if (_log_level < LOG_LEVEL_TRACE)
+    {
+        return 0;
+    }
+
     va_list args;
     va_start(args, format);
     log_write(logger, "TRACE", format, args);
