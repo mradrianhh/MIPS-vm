@@ -13,46 +13,26 @@
 #define BIT7 (uint8_t)(0b10000000)
 #define BIT(x) ((uint8_t)1 << (x))
 
+#define MAX_REGISTERS   (10)
+
 typedef uint8_t REGISTER_t;
+typedef char LOGICAL_REGISTER_t[4];
 
-union vCPU_CONTROL_REGISTER
-{
-    struct
-    {
-        uint8_t halt_exec : 1;
-        uint8_t : 7;
-    };
-    REGISTER_t control_register;
-};
-typedef union vCPU_CONTROL_REGISTER vCPU_CONTROL_REGISTER_t;
+typedef REGISTER_t REGISTER_FILE_t[MAX_REGISTERS];
+typedef LOGICAL_REGISTER_t LOGICAL_REGISTER_FILE_t[MAX_REGISTERS];
 
-union GP_REGISTERS
+enum REGISTER_ADDRESS
 {
-    struct
-    {
-        REGISTER_t R0;
-        REGISTER_t R1;
-        REGISTER_t R2;
-        REGISTER_t R3;
-    };
-    REGISTER_t registers[4];
+    REGISTER_ADDRESS_R0 = 0,
+    REGISTER_ADDRESS_R1,
+    REGISTER_ADDRESS_R2,
+    REGISTER_ADDRESS_R3,
+    REGISTER_ADDRESS_PC,
+    REGISTER_ADDRESS_LR,
+    REGISTER_ADDRESS_SP,
+    REGISTER_ADDRESS_IR,
+    REGISTER_ADDRESS_MAR,
+    REGISTER_ADDRESS_MDR,
 };
-typedef union GP_REGISTERS GP_REGISTERS_t;
-
-union SPECIAL_REGISTERS
-{
-    struct
-    {
-        REGISTER_t PC;
-        REGISTER_t LR;
-        REGISTER_t SP;
-        REGISTER_t IR;
-        REGISTER_t MAR;
-        REGISTER_t MDR;
-        vCPU_CONTROL_REGISTER_t CTL;
-    };
-    REGISTER_t registers[7];
-};
-typedef union SPECIAL_REGISTERS SPECIAL_REGISTERS_t;
 
 #endif

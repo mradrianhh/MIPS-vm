@@ -12,6 +12,7 @@
 #include "devices/vmemory/vmemory.h"
 #include "devices/vclock/EdgeChangedEvent.h"
 
+static LOGICAL_REGISTER_FILE_t logical_register_file;
 static vCPU_state_t prev_state;
 static vCPU_t vcpu;
 
@@ -51,11 +52,12 @@ void vcpu_init()
 void vcpu_update(const void *args)
 {
     const EdgeChangedEventArgs_t *e = (const EdgeChangedEventArgs_t *)args;
-    if(e->edge)
+    if (e->edge)
     {
         handle_rising();
     }
-    else {
+    else
+    {
         handle_falling();
     }
 }
@@ -99,24 +101,30 @@ void init_state()
 
 void init_registers(vCPU_state_t *state)
 {
-    memset(&state->gp_registers, 0, sizeof(state->gp_registers));
-    memset(&state->special_registers, 0, sizeof(state->special_registers));
+    // Initialize physical register file to 0.
+    memset(&state->register_file, 0, sizeof(state->register_file));
+
+    // Initialize logical register file with names.
+    strcpy(logical_register_file[REGISTER_ADDRESS_R0], "R0");
+    strcpy(logical_register_file[REGISTER_ADDRESS_R1], "R1");
+    strcpy(logical_register_file[REGISTER_ADDRESS_R2], "R2");
+    strcpy(logical_register_file[REGISTER_ADDRESS_R3], "R3");
+    strcpy(logical_register_file[REGISTER_ADDRESS_PC], "PC");
+    strcpy(logical_register_file[REGISTER_ADDRESS_LR], "LR");
+    strcpy(logical_register_file[REGISTER_ADDRESS_SP], "SP");
+    strcpy(logical_register_file[REGISTER_ADDRESS_IR], "IR");
+    strcpy(logical_register_file[REGISTER_ADDRESS_MAR], "MAR");
+    strcpy(logical_register_file[REGISTER_ADDRESS_MDR], "MDR");
 }
 
 void dump_registers(vCPU_state_t *state)
 {
     log_debug(&vcpu.logger, "\t>> Register Dump\n");
-    log_debug(&vcpu.logger, "\t%-4s:\t[0x%02x]\n", "R0", state->gp_registers.R0);
-    log_debug(&vcpu.logger, "\t%-4s:\t[0x%02x]\n", "R1", state->gp_registers.R1);
-    log_debug(&vcpu.logger, "\t%-4s:\t[0x%02x]\n", "R2", state->gp_registers.R2);
-    log_debug(&vcpu.logger, "\t%-4s:\t[0x%02x]\n", "R3", state->gp_registers.R3);
-    log_debug(&vcpu.logger, "\t%-4s:\t[0x%02x]\n", "MAR", state->special_registers.MAR);
-    log_debug(&vcpu.logger, "\t%-4s:\t[0x%02x]\n", "MDR", state->special_registers.MDR);
-    log_debug(&vcpu.logger, "\t%-4s:\t[0x%02x]\n", "PC", state->special_registers.PC);
-    log_debug(&vcpu.logger, "\t%-4s:\t[0x%02x]\n", "LR", state->special_registers.LR);
-    log_debug(&vcpu.logger, "\t%-4s:\t[0x%02x]\n", "SP", state->special_registers.SP);
-    log_debug(&vcpu.logger, "\t%-4s:\t[0x%02x]\n", "IR", state->special_registers.IR);
-    log_debug(&vcpu.logger, "\t%-4s:\t[0x%02x]\n", "CTL", state->special_registers.CTL.control_register);
+    for (int i = 0; i < MAX_REGISTERS; i++)
+    {
+        log_debug(&vcpu.logger, "\t%-4s:\t[0x%02x]\n",
+                  logical_register_file[i], state->register_file[i]);
+    }
 }
 
 void handle_rising()
@@ -124,22 +132,24 @@ void handle_rising()
     log_info(&vcpu.logger, ">> CYCLE START.\n");
     // Fetch instruction
     // 1. Load prev-PC into prev-MAR.
-    vcpu.state.special_registers.MAR = prev_state.special_registers.PC;
+    vcpu.state.register_file[REGISTER_ADDRESS_MAR] = prev_state.register_file[REGISTER_ADDRESS_PC];
     // 2. Memory controller communicates prev-MAR over address bus.
     // 3. Memory listens on address bus and returns address.
     // 4. Memory controller places data into MDR.
-    vcpu.state.special_registers.MDR = vmemory_fetch(vcpu.state.special_registers.MAR);
+    vcpu.state.register_file[REGISTER_ADDRESS_MDR] = vmemory_fetch(vcpu.state.register_file[REGISTER_ADDRESS_MAR]);
     // 5. Load MDR into IR.
-    vcpu.state.special_registers.IR = vcpu.state.special_registers.MDR;
+    vcpu.state.register_file[REGISTER_ADDRESS_IR] = vcpu.state.register_file[REGISTER_ADDRESS_MDR];
     log_info(&vcpu.logger, "Fetch: Instruction [0x%02x] at address [0x%02x](PC).\n",
-             vcpu.state.special_registers.IR, prev_state.special_registers.PC);
+             vcpu.state.register_file[REGISTER_ADDRESS_IR],
+             prev_state.register_file[REGISTER_ADDRESS_PC]);
     // 6. Increment prev-PC.
-    vcpu.state.special_registers.PC++;
+    vcpu.state.register_file[REGISTER_ADDRESS_PC]++;
 
     // Decode instruction
     // 1. Decode prev-IR.
-    vcpu.state.decoded_insn = vcpu_decoder_decode(prev_state.special_registers.IR);
-    log_info(&vcpu.logger, "Decode: Instruction [0x%02x].\n", prev_state.special_registers.IR);
+    vcpu.state.decoded_insn = vcpu_decoder_decode(prev_state.register_file[REGISTER_ADDRESS_IR]);
+    log_info(&vcpu.logger, "Decode: Instruction [0x%02x].\n",
+             prev_state.register_file[REGISTER_ADDRESS_IR]);
 
     // Execute instruction
     // 1. Execute prev-INSN.
@@ -173,12 +183,12 @@ void vcpu_insn_execute_nop(vCPU_INSN_OPERANDS_t operands)
 
 void vcpu_insn_execute_add(vCPU_INSN_OPERANDS_t operands)
 {
-    vcpu.state.gp_registers.registers[operands.operand1] += vcpu.state.gp_registers.registers[operands.operand2];
+    vcpu.state.register_file[operands.operand1] += vcpu.state.register_file[operands.operand2];
 }
 
 void vcpu_insn_execute_mov(vCPU_INSN_OPERANDS_t operands)
 {
-    vcpu.state.gp_registers.registers[operands.operand1] = vcpu.state.gp_registers.registers[operands.operand2];
+    vcpu.state.register_file[operands.operand1] = vcpu.state.register_file[operands.operand2];
 }
 
 void vcpu_insn_execute_ldr(vCPU_INSN_OPERANDS_t operands)

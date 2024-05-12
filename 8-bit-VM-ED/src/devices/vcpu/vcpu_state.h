@@ -8,8 +8,7 @@ typedef struct vCPU_state vCPU_state_t;
 
 struct vCPU_state
 {
-    GP_REGISTERS_t gp_registers;
-    SPECIAL_REGISTERS_t special_registers;
+    REGISTER_FILE_t register_file;
     vCPU_INSN_t decoded_insn;
 };
 
