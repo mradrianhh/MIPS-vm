@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The goal of this project is to evaluate a PoC software-archicture design for implementing an emulated computer. When reached, we hope to have a design where you can run the virtual machine and provide it a binary file. The machine will then upload the binary data into it's virtual memory and begin execution. 
+The goal of this project is to evaluate a PoC software-archicture design for implementing an emulated MIPS R3000 computer. When reached, we hope to have a design where you can run the virtual machine and provide it a binary file. The machine will then upload the binary data into it's virtual memory and begin execution. 
 
 At this moment, the project attempts to emulate a computer consisting only of a CPU, a clock and some memory. The computer has a very simplified instruction set whose only aim is to accomodate testing of the architecture.
 
@@ -44,6 +44,13 @@ Care must be taken to distinguish between the virtual address space provided by 
 
 It is also worth noting that for a single-application virtual machine, such as an emulated single-application embedded system, the virtual address space(not the host virtual address space) is the complete virtual memory.
 
+The addressability of the user space is 2 GB, since this is a 32-bit computer with a 32-bit PC.
+The total addressability is 4 GB.
+
+The memory map consists of four segments: **kuseg**, **kseg0**, **kseg1** and **kseg2**.
+
+The logical user address space is the **kuseg**-segment which ranges from address 0x00000000 to 0x7FFFFFFF
+
 # Virtual CPU
 
 The CPU is inspired by the design of a classic RISC pipeline. This means that it's designed to implement a five step pipeline comprising of:
@@ -60,7 +67,7 @@ An instruction can have a maximum of two source register and one destination reg
 
 ## Instruction fetch
 
-During instruction fetch, the CPU spends one cycle to fetch the instruction from memory at the address pointed to by the PC. Afterwards, it needs to recalculate the PC. Since all instructions has the same length and this is an 8-bit computer, PC is incremented by one byte. In the case of a branch, jump or exception, the PC needs to be set to the appropriate address. PC will always be incremented here, but it might be re-calculated in the decode stage.
+During instruction fetch, the CPU spends one cycle to fetch the instruction from memory at the address pointed to by the PC. Afterwards, it needs to recalculate the PC. Since all instructions has the same length and this is a 32-bit computer, PC is incremented by 4 bytes. In the case of a branch, jump or exception, the PC needs to be set to the appropriate address. PC will always be incremented here, but it might be re-calculated in the decode stage.
 
 ## Instruction decode
 
@@ -133,6 +140,159 @@ If you were to add up two large integers that don't fit in a 32-bit register, yo
 Exceptions are resolved in the write-back stage, and when an exception occurs, it's important for it to be precise. This means that all instructions before the exception occured have been executed, and all instructions after it occured won't be executed. Execution is prevented by invalidating the latter. 
 
 For most instruction's, this is handled implicitly by the pipeline's nature since they write their results during the write-back stage, but the store instruction's write their results during the memory access stage to the Store Data Queue. If a store instruction is invalidated, this Store Data Queue must be invalidated so that it's not written to memory later.
+
+## Instruction Set Architecture
+
+The MIPS R3000 computer implemented the MIPS I ISA.
+
+MIPS I is a load/store architecture. It only supports register-to-register operations with the exception of memory access.
+
+### Registers
+
+MIPS I has thirty-two 32-bit registers. 
+
+Register $0 is hardwired to zero such that all writes to it are discarded.
+
+Register $31 is the link-register.
+
+For multiplication and division operations there is two registers called HI and LO to hold the upper 32-bit result and lower 32-bit result, respectively. There is also a small set of instructions for copying data between general-purpose registers and the HI/LO register.
+
+The program-counter is 32-bits with the two low-order bits always containing zero as the instructions are fixed-size and aligned to their natural word boundary. This also implies that when data is inserted, alignment must be kept for the instructions to keep their data integrity.
+
+The complete register list is provided in the table below.
+
+| Name    | Number | Usage                | Preserved |
+| :----   | :----- | :------------        | :-------- |
+| $zero   | 0      | Constant zero        | No        |
+| $at     | 1      | Reserved (assembler) | No        |
+| $v0-$v1 | 2-3    | Function result      | No        |
+| $a0-$a3 | 4-7    | Function arguments   | No        |
+| $t0-$t7 | 8-15   | Temporaries          | No        |
+| $s0-$s7 | 16-23  | Saved                | Yes       |
+| $t8-$t9 | 24-25  | Temporaries          | No        |
+| $k0-$k1 | 26-27  | Reserved(OS)         | No        |
+| $gp     | 28     | Global pointer       | Yes       |
+| $sp     | 29     | Stack pointer        | Yes       |
+| $fp     | 30     | Frame pointer        | Yes       |
+| $ra     | 31     | Return address       | Yes       |
+| PC      | --     | Program Counter      | Yes       |
+| HI      | --     | Upper 32-bits        | Yes       |
+| LO      | --     | Lower 32-bits        | Yes       |
+### Instruction formats
+
+**R:**
+- **Bits[26-31]**: opcode(6 bits).
+- **Bits[21-25]**: rs(5 bits).
+- **Bits[16-20]**: rt(5 bits).
+- **Bits[11-15]**: rd(5 bits).
+- **Bits[6-10]**: shamt(5 bits).
+- **Bits[0-5]**: funct(6 bits).
+
+**I:**
+- **Bits[26-31]**: opcode(6 bits).
+- **Bits[21-25]**: rs(5 bits).
+- **Bits[16-20]**: rt(5 bits).
+- **Bits[0-15]**: immediate(16 bits).
+
+**J:**
+- **Bits[26-31]**: opcode(6 bits).
+- **Bits[0-25]**: address(26 bits).
+
+### Instructions
+
+MIPS I has instructions that can load and store 8-bit bytes, 16-bit halfwords and 32-bit words. Only one addressing mode is supported: (base + displacement).
+
+The instruction set can be divided into three groups:
+
+1. Arithmetic/bitwise operations. Addition, left-shift, etc.
+2. Data transfer operations.
+3. Control flow operations.
+    - Unconditionally jump to an address in memory.
+    - Jump to an address if a register has a value of zero.
+    - Invoke a function.
+    - Return from a function.
+
+Since MIPS I is a 32-bit architecture, loading values less then 32-bits requires the datum to be either sign- or zero-extended. In the case of instructions suffixed with "unsigned", they perform zero-extension. Otherwise, sign-extension is performed.
+
+#### Load and store
+
+Load instructions source the base from the GPR denoted by **rs** in the instruction format, and they write the result to the GPR denoted by **rt**.
+
+Store instructions also source the base from **rs**, but store the content *from* the register **rt**.
+
+All load and store instructions compute the address by summing the base from **rs** with the sign-extended 16-bit immediate value.
+
+All memory accesses are required to be aligned on their natural word boundary. If not, an exception is signaled. However, to support efficient unaligned memory access, there are load/store instructions suffixed by "left"/"right".
+
+All load instructions are followed by a *load delay slot* to prevent a data hazard as mentioned above. The instruction in the load delay slot can not use the data loaded by the load instruction. If the following instruction needs to use that data, a NOP instruction needs to be inserted into the load delay slot, also known as a bubble. This design is not efficient, as it wastes CPU cycles and reduces the overall throughput, but it's a very simple way of dealing with the issue.
+
+#### Addition and subtraction
+
+MIPS I has instructions to perform addition and subtraction. They source their operands from the GPR's denoted by **rs** and **rt** in the format, and write the result to the GRP denoted by **rd**. Alternatively, addition can source one of it's operands from a 16-bit immediate value that is sign-extended to 32-bits.
+
+Addition and subtraction instructions has two variants. By default, an exception is signaled if the result overflows. Instructions with the "unsigned" suffix however, do not signal an exception. In this case, the overflow check interprets it as a 32-bit two's complement integer.
+
+#### Bitwise logic
+
+MIPS I has the following instructions to perform bitwise operations: AND, OR, XOR and NOR. These instructions also source their operands from the GRP's denoted by **rs** and **rt**, and similarly writes the result to the GRP denoted by **rd**. Also, similarly, they can alternatively retrieve one of their operands from a 16-bit immediate which is *zero-extended* to 32-bits.
+
+#### Set on *relation*
+
+The Set on *relation* instructions writes one or zero to the destination register if the specified relation is true or false, respectively. These instructions source their operands from two GRP's, or alternatively one GRP and one 16-bit immediate value that is sign-extended to 32-bits, and write the result to the third GPR. By default, the operands are interpreted as signed integers. The variants with the "unsigned" suffix interpret the operands as unsigned, even the 16-bit immediate value that is sign-extended.
+
+#### Load 32-bit immediate
+
+When loading a 32-bit immediate, the MIPS I ISA provides the instruction "load upper immediate" to load the high-order 16-bits of a GPR with a 16-bit immediate value. This instruction is used in conjunction with the "OR immediate" instruction to load the remaining low-order 16-bits into the register.
+
+#### Logical and arithmetic shifts
+
+MIPS I provides instructions for performing left and right arithmetic and logical shifts. The operand is obtained from the GRP denoted by **rt**, and the result is written to the GRP denoted by **rd**. The shift distance is obtained either from the GPR denoted by **rs** or from the 5-bit shift amount denoted by **sa**.
+
+#### Multiplication and division
+
+MIPS I provides instructions for signed and unsigned integer multiplication and division. These instructions retrieve their operands from two GPR's and because these instructions may execute separately, or concurrently, with  the other CPU instructions, they write their result to a pair of 32-bit registers called **HI** and **LO**. 
+
+For multiplication, the high- and low-order 32-bits of the 64-bit result is written to **HI** and **LO**, respectively. For division, the quotient is written to **LO** and the remainder to **HI**.
+
+To access the results, a pair of instructions is provided to copy the content of **HI**/**LO** to a GPR: Move from **LO** and Move from **HI**.
+
+These instructions are interlocked, meaning that reads of **HI** and **LO** do not proceed past an unfinished arithmetic operation that will write to **HI** or **LO**.
+
+A pair of instructions is also provided to write to **HI** or **LO**: Move to **HI** and Move to **LO**. These are used to restore **HI** and **LO** to their original state after exception handling.
+
+Instructions that read **HI** or **LO** must be separated by two instructions that don't write to **HI** or **LO**.
+
+#### Control flow
+
+All MIPS I control flow instructions are followed by a *branch delay slot*.
+
+A *delay slot*, generally, is an inserted instruction that is not affected by the preceding instruction. In this case, a branch delay slot is an instruction that is not affected by the branch. The most simple case, is a NOP instruction. Branch delay slots are used to maintain the timing for an instruction that needs more cycles to complete.
+
+For the MIPS I, unless the branch delay slot is filled with an instruction performing useful work, a NOP instruction is substituted.
+
+MIPS I branch instructions compare the content of the GPR denoted by **rs** against either zero or another GRP denoted by **rt** as signed integers and branch if true.
+
+Control is transferred to the address computed by shifting the 16-bit offset left by two bits, sign-extending it to a 32-bit result and adding it with the sum of the program counter and the value 8(base-10).
+
+Jumps have two versions: absolute and register-indirect.
+
+Absolute jumps include the instructions "Jump" and "Jump and link". They compute the address to which control is transferred by shifting the 26-bit inst_index left by two bits, and concatenating the 28-bit result with the four higher-order bits of the address of the instruction in the branch delay slot.
+
+Register-indirect jumps include the instructions "Jump register" and "Jump and link register". They transfer control to the address stored in the GRP denoted by **rs**. This address must be word-aligned. If not, an exception is signaled after the instruction in the branch delay slot is executed.
+
+Branch and jump instructions that link store the return address in the link register(GRP 31). The "Jump and link register" instruction allows the return address to be stored in any writable GPR.
+
+#### Exception signaling
+
+MIPS I has two instructions for signaling exceptions: "System Call" and "Breakpoint". "System Call" is used by user-mode software to make kernel calls, and "Breakpoint" is used to transfer control to a debugger via the kernel's exception handler.
+
+Both instructions has a 20-bit code field that can contain operating-environment specific information for the exception handler.
+
+#### Floating-point operations
+
+MIPS I has 32 floating-point registers. These are paired to double precision numbers. Odd numbered registers can not be used for arithmetic and branching resulting in 16 usable registers. Moves/copies and load/stores are not affected.
+
+Single precision is denoted by the ".s" suffix, double precision is denoted by the ".d" suffix.
 
 ## Change log
 
