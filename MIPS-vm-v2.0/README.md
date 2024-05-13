@@ -51,6 +51,8 @@ The memory map consists of four segments: **kuseg**, **kseg0**, **kseg1** and **
 
 The logical user address space is the **kuseg**-segment which ranges from address 0x00000000 to 0x7FFFFFFF
 
+![Alt text](./Memory%20Map.drawio.svg)
+
 # Virtual CPU
 
 The CPU is inspired by the design of a classic RISC pipeline. This means that it's designed to implement a five step pipeline comprising of:
