@@ -1,7 +1,7 @@
 #ifndef _8BITVM_VCPU_STATE_H_
 #define _8BITVM_VCPU_STATE_H_
 
-#include "vregisters.h"
+#include "vcpu_registers.h"
 #include "vcpu_decoder.h"
 
 typedef struct vCPU_state vCPU_state_t;

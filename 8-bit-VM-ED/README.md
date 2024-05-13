@@ -133,3 +133,9 @@ If you were to add up two large integers that don't fit in a 32-bit register, yo
 Exceptions are resolved in the write-back stage, and when an exception occurs, it's important for it to be precise. This means that all instructions before the exception occured have been executed, and all instructions after it occured won't be executed. Execution is prevented by invalidating the latter. 
 
 For most instruction's, this is handled implicitly by the pipeline's nature since they write their results during the write-back stage, but the store instruction's write their results during the memory access stage to the Store Data Queue. If a store instruction is invalidated, this Store Data Queue must be invalidated so that it's not written to memory later.
+
+## Change log
+
+- 12.05.2024 vCPU: Remove vCPU_state. Add buffers between pipeline stages.
+
+- 10.05.2024: Version 2.0

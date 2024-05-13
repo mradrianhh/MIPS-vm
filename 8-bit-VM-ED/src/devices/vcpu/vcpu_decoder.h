@@ -2,7 +2,7 @@
 #define _8BITVM_VCPU_DECODER_H_
 
 #include <stdint.h>
-#include "vregisters.h"
+#include "vcpu_registers.h"
 
 #define OPCODE_MASK (uint8_t)(0b11110000)
 #define DEST_MASK (uint8_t)(0b00001100)
