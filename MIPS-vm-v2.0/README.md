@@ -65,6 +65,8 @@ The CPU is inspired by the design of a classic RISC pipeline. This means that it
 
 Between each stage, there are buffers to forward information from one stage to the next.
 
+![Alt text](./CPU.drawio.svg)
+
 An instruction can have a maximum of two source register and one destination register.
 
 ## Instruction fetch
