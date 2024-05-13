@@ -36,7 +36,6 @@ $(BUILD_DIRS)/%.c.o: %.c
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-
 .PHONY: clean
 clean:
 	rm -r $(BUILD_DIRS)

@@ -218,6 +218,8 @@ The instruction set can be divided into three groups:
 
 Since MIPS I is a 32-bit architecture, loading values less then 32-bits requires the datum to be either sign- or zero-extended. In the case of instructions suffixed with "unsigned", they perform zero-extension. Otherwise, sign-extension is performed.
 
+A complete list of instructions can be found in the [here](./MIPS%20Instruction%20Set.pdf).
+
 #### Load and store
 
 Load instructions source the base from the GPR denoted by **rs** in the instruction format, and they write the result to the GPR denoted by **rt**.
@@ -297,6 +299,39 @@ Both instructions has a 20-bit code field that can contain operating-environment
 MIPS I has 32 floating-point registers. These are paired to double precision numbers. Odd numbered registers can not be used for arithmetic and branching resulting in 16 usable registers. Moves/copies and load/stores are not affected.
 
 Single precision is denoted by the ".s" suffix, double precision is denoted by the ".d" suffix.
+
+## Cross-compilation
+
+Compilation is done with the gcc-mips-linux-gnu cross-compilation toolchain.
+
+When assembling with mips-linux-gnu-as, specify the following options:
+
+- -mips1: Compile according to the MIPS I ISA.
+- -g: Generate debugging information.
+- -o [output_file]: Provide the correct name for your object file.
+- -O0: Prevent removal of unneeded NOPs and branch swapping.
+- -msoft-float: Floating point instructions is not supported yet. Do not allow floating-point instructions.
+- -alg=[file_name]: Write listing with assembly code and general information to file [file_name].
+
+When dumping the object file with mips-linux-gnu-objdump, specify the following options:
+
+**Specify one of these**:
+- -g: To specify debug information in object file. 
+- -S: To Intermix source code with disassembly.
+- -d: To display assembler contents of executable sections.
+- -D: To display assembler contents of all sections.
+
+**Optional**:
+- -l: Include line numers and filenames in output.
+- -Mreg-names=32,reg-names=r3000
+
+When linking the object file with mips-linux-gnu-ld, specify the following options:
+
+- -T [file_name]: Read linker script.
+- --no-gc-sections: Don't remove unused sections.
+- -Map [file_name]: Write a linker map to [file_name].
+- --oformat binary: Create binary file.
+- --print-output-format: Print default output format.
 
 ## Change log
 
