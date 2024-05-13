@@ -19,14 +19,14 @@ ASFLAGS := -g -mips1 -O0 -msoft-float
 AS := mips-linux-gnu-as
 
 LD := mips-linux-gnu-ld
-LDFLAGS := --no-gc-sections --print-output-format
+LDFLAGS := --no-gc-sections --print-output-format --verbose
 
 OBJDUMP := mips-linux-gnu-objdump
 DUMPFLAGS := -S 
 
 # The final build step.
 $(BUILD_DIRS)/$(TARGET): $(OBJS)
-	$(LD) $(OBJS) -o $@ $(LDFLAGS) -Map $@_map
+	$(LD) $(OBJS) -o $@ $(LDFLAGS) -Map $@_map > $@_output
 
 # Build step for asm source
 $(BUILD_DIRS)/%.s.o: %.s
