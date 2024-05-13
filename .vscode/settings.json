@@ -20,6 +20,8 @@
         "*.REXXINC*": "rexx",
         "*.rex": "rexx",
         "*.rexx": "rexx",
+        "*.h": "c",
+        "*.c": "c",
         "library.h": "c",
         "libtest.h": "c",
         "stdint.h": "c",

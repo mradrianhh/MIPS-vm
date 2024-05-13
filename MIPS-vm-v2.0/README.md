@@ -1,4 +1,4 @@
-# 8-bit-VM - version 2.0
+# MIPS-vm - version 2.0
 
 ## Introduction
 
