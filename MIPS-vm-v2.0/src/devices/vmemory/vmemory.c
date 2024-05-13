@@ -47,9 +47,4 @@ static void vmemory_example_load()
     {
         vmemory.start[i] = 0;
     }
-
-    for (int i = 0; i < 4; i++)
-    {
-        vmemory.start[i] = (i + 1) << 4;
-    }
 }

@@ -4,10 +4,15 @@
 #include <stdint.h>
 #include "vcpu_registers.h"
 
-#define OPCODE_MASK (uint8_t)(0b11110000)
-#define DEST_MASK (uint8_t)(0b00001100)
-#define SOURCE_MASK (uint8_t)(0b00000011)
-#define OPCODE_MAX_RANGE (uint8_t)(0b1111)
+#define OPCODE_MASK         (uint32_t)(0xFC000000) // (0b1111 1100 0000 0000 0000 0000 0000 0000)
+#define RS_MASK             (uint32_t)(0x03E00000) // (0b0000 0011 1110 0000 0000 0000 0000 0000)
+#define RT_MASK             (uint32_t)(0x001F0000) // (0b0000 0000 0001 1111 0000 0000 0000 0000)
+#define RD_MASK             (uint32_t)(0x0000F800) // (0b0000 0000 0000 0000 1111 1000 0000 0000)
+#define SHAMT_MASK          (uint32_t)(0x000007C0) // (0b0000 0000 0000 0000 0000 0111 1100 0000)
+#define FUNCT_MASK          (uint32_t)(0x0000003F) // (0b0000 0000 0000 0000 0000 0000 0011 1111)
+#define IMMED_MASK          (uint32_t)(0x0000FFFF) // (0b0000 0000 0000 0000 1111 1111 1111 1111)
+#define ADDRESS_MASK        (uint32_t)(0x03FFFFFF) // (0b0000 0011 1111 1111 1111 1111 1111 1111)
+#define OPCODE_MAX_RANGE    (uint32_t)(0x0000003F) // (0b0011 1111) = 64
 
 // Summary:
 //   Struct with three indexes for the registers to use.
@@ -67,7 +72,7 @@ typedef void (*vcpu_insn_execute_t)(vCPU_INSN_OPERANDS_t operands);
 // Params:
 //   uint8_t: instruction:
 //     The instruction to decode.
-typedef vCPU_INSN_t (*vcpu_insn_decode_t)(uint8_t instruction);
+typedef vCPU_INSN_t (*vcpu_insn_decode_t)(uint32_t instruction);
 
 // Summary:
 //   Initializes the decoders.
@@ -123,11 +128,6 @@ union vCPU_INSN_DECODER_MAP
     struct
     {
         vcpu_insn_decode_t nop;
-        vcpu_insn_decode_t add;
-        vcpu_insn_decode_t mov;
-        vcpu_insn_decode_t ldr;
-        vcpu_insn_decode_t str;
-        vcpu_insn_decode_t _buf[12];
     };
     vcpu_insn_decode_t decoders[OPCODE_MAX_RANGE];
 };
@@ -137,22 +137,52 @@ union vCPU_INSN_EXECUTER_MAP
     struct
     {
         vcpu_insn_execute_t nop;
-        vcpu_insn_execute_t add;
-        vcpu_insn_execute_t mov;
-        vcpu_insn_execute_t ldr;
-        vcpu_insn_execute_t str;
-        vcpu_insn_execute_t _buf[12];
     };
     vcpu_insn_execute_t executers[OPCODE_MAX_RANGE];
 };
 
 enum vCPU_INSN_TYPE
 {
-    NOP = 0,
-    ADD,
-    MOV,
-    LDR,
-    STR,
+    ADD = 0,
+    ADDU,
+    SUB,
+    SUBU,
+    MUL, 
+    MULU,
+    DIV,
+    DIVU,
+    SLT,
+    SLTU,
+    AND,
+    OR,
+    XOR,
+    NOR,
+    ADDI,
+    ADDIU,
+    SLTI,
+    SLTIU,
+    ANDI,
+    ORI,
+    XORI,
+    LW,
+    SW,
+    LBU,
+    LB,
+    SB,
+    LUI,
+    BEQ,
+    BNE,
+    BLEZ,
+    BGTZ,
+    BLTZ,
+    J,
+    JAL,
+    JR,
+    JALR,
+    NOP,
+    MFHI,
+    MFLO,
+    // TODO: Floating point and exception handling.
 };
 
 #endif

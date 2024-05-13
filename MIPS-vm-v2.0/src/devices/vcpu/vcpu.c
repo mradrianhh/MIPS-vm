@@ -105,16 +105,41 @@ void init_registers(vCPU_state_t *state)
     memset(&state->register_file, 0, sizeof(state->register_file));
 
     // Initialize logical register file with names.
-    strcpy(logical_register_file[REGISTER_ADDRESS_R0], "R0");
-    strcpy(logical_register_file[REGISTER_ADDRESS_R1], "R1");
-    strcpy(logical_register_file[REGISTER_ADDRESS_R2], "R2");
-    strcpy(logical_register_file[REGISTER_ADDRESS_R3], "R3");
+    strcpy(logical_register_file[REGISTER_ADDRESS_ZERO], "$zero");
+    strcpy(logical_register_file[REGISTER_ADDRESS_AT], "$at");
+    strcpy(logical_register_file[REGISTER_ADDRESS_V0], "$v0");
+    strcpy(logical_register_file[REGISTER_ADDRESS_V1], "$v1");
+    strcpy(logical_register_file[REGISTER_ADDRESS_A0], "$a0");
+    strcpy(logical_register_file[REGISTER_ADDRESS_A1], "$a1");
+    strcpy(logical_register_file[REGISTER_ADDRESS_A2], "$a2");
+    strcpy(logical_register_file[REGISTER_ADDRESS_A3], "$a3");
+    strcpy(logical_register_file[REGISTER_ADDRESS_T0], "$t0");
+    strcpy(logical_register_file[REGISTER_ADDRESS_T1], "$t1");
+    strcpy(logical_register_file[REGISTER_ADDRESS_T2], "$t2");
+    strcpy(logical_register_file[REGISTER_ADDRESS_T3], "$t3");
+    strcpy(logical_register_file[REGISTER_ADDRESS_T4], "$t4");
+    strcpy(logical_register_file[REGISTER_ADDRESS_T5], "$t5");
+    strcpy(logical_register_file[REGISTER_ADDRESS_T6], "$t6");
+    strcpy(logical_register_file[REGISTER_ADDRESS_T7], "$t7");
+    strcpy(logical_register_file[REGISTER_ADDRESS_S0], "$s0");
+    strcpy(logical_register_file[REGISTER_ADDRESS_S1], "$s1");
+    strcpy(logical_register_file[REGISTER_ADDRESS_S2], "$s2");
+    strcpy(logical_register_file[REGISTER_ADDRESS_S3], "$s3");
+    strcpy(logical_register_file[REGISTER_ADDRESS_S4], "$s4");
+    strcpy(logical_register_file[REGISTER_ADDRESS_S5], "$s5");
+    strcpy(logical_register_file[REGISTER_ADDRESS_S6], "$s6");
+    strcpy(logical_register_file[REGISTER_ADDRESS_S7], "$s7");
+    strcpy(logical_register_file[REGISTER_ADDRESS_T8], "$t8");
+    strcpy(logical_register_file[REGISTER_ADDRESS_T9], "$t9");
+    strcpy(logical_register_file[REGISTER_ADDRESS_K0], "$k0");
+    strcpy(logical_register_file[REGISTER_ADDRESS_K1], "$k1");
+    strcpy(logical_register_file[REGISTER_ADDRESS_GP], "$gp");
+    strcpy(logical_register_file[REGISTER_ADDRESS_SP], "$sp");
+    strcpy(logical_register_file[REGISTER_ADDRESS_FP], "$fp");
+    strcpy(logical_register_file[REGISTER_ADDRESS_RA], "$ra");
     strcpy(logical_register_file[REGISTER_ADDRESS_PC], "PC");
-    strcpy(logical_register_file[REGISTER_ADDRESS_LR], "LR");
-    strcpy(logical_register_file[REGISTER_ADDRESS_SP], "SP");
-    strcpy(logical_register_file[REGISTER_ADDRESS_IR], "IR");
-    strcpy(logical_register_file[REGISTER_ADDRESS_MAR], "MAR");
-    strcpy(logical_register_file[REGISTER_ADDRESS_MDR], "MDR");
+    strcpy(logical_register_file[REGISTER_ADDRESS_HI], "HI");
+    strcpy(logical_register_file[REGISTER_ADDRESS_LO], "LO");
 }
 
 void dump_registers(vCPU_state_t *state)
@@ -130,6 +155,7 @@ void dump_registers(vCPU_state_t *state)
 void handle_rising()
 {
     log_info(&vcpu.logger, ">> CYCLE START.\n");
+    /*
     // Fetch instruction
     // 1. Load prev-PC into prev-MAR.
     vcpu.state.register_file[REGISTER_ADDRESS_MAR] = prev_state.register_file[REGISTER_ADDRESS_PC];
@@ -155,6 +181,7 @@ void handle_rising()
     // 1. Execute prev-INSN.
     prev_state.decoded_insn.execute(prev_state.decoded_insn.operands);
     log_info(&vcpu.logger, "Execute: Instruction [0x%02x].\n", prev_state.decoded_insn.ir);
+    */
 }
 
 void handle_falling()
@@ -169,32 +196,10 @@ vCPU_INSN_EXECUTER_MAP_t init_executer_map()
 {
     vCPU_INSN_EXECUTER_MAP_t map;
     map.executers[NOP] = vcpu_insn_execute_nop;
-    map.executers[ADD] = vcpu_insn_execute_add;
-    map.executers[MOV] = vcpu_insn_execute_mov;
-    map.executers[LDR] = vcpu_insn_execute_ldr;
-    map.executers[STR] = vcpu_insn_execute_str;
 
     return map;
 }
 
 void vcpu_insn_execute_nop(vCPU_INSN_OPERANDS_t operands)
-{
-}
-
-void vcpu_insn_execute_add(vCPU_INSN_OPERANDS_t operands)
-{
-    vcpu.state.register_file[operands.operand1] += vcpu.state.register_file[operands.operand2];
-}
-
-void vcpu_insn_execute_mov(vCPU_INSN_OPERANDS_t operands)
-{
-    vcpu.state.register_file[operands.operand1] = vcpu.state.register_file[operands.operand2];
-}
-
-void vcpu_insn_execute_ldr(vCPU_INSN_OPERANDS_t operands)
-{
-}
-
-void vcpu_insn_execute_str(vCPU_INSN_OPERANDS_t operands)
 {
 }
