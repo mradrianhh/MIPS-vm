@@ -1,5 +1,5 @@
-#ifndef _8BITVM_LOGGER_H_
-#define _8BITVM_LOGGER_H_
+#ifndef _MIPSVM_LOGGER_H_
+#define _MIPSVM_LOGGER_H_
 
 #include <stdio.h>
 #include <pthread.h>

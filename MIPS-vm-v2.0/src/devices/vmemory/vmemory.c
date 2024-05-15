@@ -5,8 +5,6 @@
 
 #include "vmemory.h"
 
-static void vmemory_example_load();
-
 static vMEMORY_t vmemory;
 
 void vmemory_init()
@@ -22,7 +20,6 @@ void vmemory_init()
     vmemory.start = malloc(MEMORY_SIZE);
     memset(vmemory.start, 0, MEMORY_SIZE);
 
-    vmemory_example_load();
 }
 
 void vmemory_shutdown()
@@ -31,20 +28,17 @@ void vmemory_shutdown()
     logger_shutdown(&vmemory.logger);
 }
 
-PAGE_t vmemory_fetch(uint8_t address)
+Word_t vmemory_fetch_instruction(Word_t address)
 {
-    return vmemory.start[address];
-}
-
-void vmemory_write(uint8_t address, PAGE_t data)
-{
-    vmemory.start[address] = data;
-}
-
-static void vmemory_example_load()
-{
-    for (int i = 0; i < MEMORY_SIZE; i++)
+    Word_t instruction;
+    for(int i = address.word; i < address.word + 4; i++)
     {
-        vmemory.start[i] = 0;
+        instruction.bytes[i - address.word] = vmemory.start[i];
     }
+    return instruction;
+}
+
+uint8_t *vmemory_get_memory_ref()
+{
+    return vmemory.start;
 }

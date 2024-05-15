@@ -1,5 +1,5 @@
-#ifndef _8BITVM_VREGISTERS_H_
-#define _8BITVM_VREGISTERS_H_
+#ifndef _MIPSVM_VREGISTERS_H_
+#define _MIPSVM_VREGISTERS_H_
 
 #include <stdint.h>
 

@@ -3,6 +3,7 @@
 #include "devices/vcpu/vcpu.h"
 #include "devices/vmemory/vmemory.h"
 #include "devices/vclock/vclock.h"
+#include "internal/loader/loader.h"
 
 static void init();
 static void configure();
@@ -31,6 +32,7 @@ void configure()
 {
     event_create("edge_changed");
     event_subscribe("edge_changed", vcpu_update);
+    loader_load_elf32("../examples/asm/build/gcd");
 }
 
 void shutdown()

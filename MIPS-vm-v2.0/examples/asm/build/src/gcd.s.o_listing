@@ -7,7 +7,7 @@ GAS LISTING src/gcd.s 			page 1
  input file    	: src/gcd.s
  output file   	: build/./src/gcd.s.o
  target        	: mips-unknown-linux-gnu
- time stamp    	: 2024-05-13T18:09:11.000+0200
+ time stamp    	: 2024-05-14T10:21:58.000+0200
 
 GAS LISTING src/gcd.s 			page 2
 
@@ -19,7 +19,7 @@ GAS LISTING src/gcd.s 			page 1
    5 0000 1085000A 	    beq		$a0, $a1, .L2	    # If a == b, goto .L2(exit).
    5      00000000 
    6 0008 0085102A 	    sgt     $v0, $a1, $a0       # Is b > a?
-   7 000c 15090004 	    bne		$t0, $t1, .L1	    # Yes, subtract a from b(go to .L1).
+   7 000c 14400004 	    bne		$v0, $zero, .L1	    # Yes, subtract a from b(go to .L1).
    7      00000000 
    8              	    
    9 0014 00852023 	    subu    $a0, $a0, $a1       # No, subtract b from a.

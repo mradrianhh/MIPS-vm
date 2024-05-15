@@ -1,31 +1,35 @@
-#ifndef _8BITVM_VMEMORY_H_
-#define _8BITVM_VMEMORY_H_
+#ifndef _MIPSVM_VMEMORY_H_
+#define _MIPSVM_VMEMORY_H_
 
 #include <stdint.h>
 
 #include "internal/device_table/device_table.h"
 #include "internal/logger/logger.h"
 
-#define PAGE_NUM                    256
-#define MEMORY_SIZE                 sizeof(PAGE_t) * PAGE_NUM
+#define PAGE_NUM                    4000000000
+#define MEMORY_SIZE                 sizeof(uint8_t) * PAGE_NUM
 
-typedef uint8_t PAGE_t;
-
-struct vMEMORY 
+typedef struct  
 {
     LOGGER_t logger;
     DEVICE_TABLE_ENTRY_t *device_info;
-    PAGE_t* start;
-};
-typedef struct vMEMORY vMEMORY_t;
+    uint8_t* start;
+} vMEMORY_t;
+
+typedef union 
+{
+    uint8_t bytes[4];
+    uint32_t word;
+} Word_t;
+
 
 // Initializes virtual memory.
 void vmemory_init();
 
 void vmemory_shutdown();
 
-PAGE_t vmemory_fetch(uint8_t address);
+Word_t vmemory_fetch_instruction(Word_t address);
 
-void vmemory_write(uint8_t address, PAGE_t data);
+uint8_t *vmemory_get_memory_ref();
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef _8BITVM_VCPU_H_
-#define _8BITVM_VCPU_H_
+#ifndef _MIPSVM_VCPU_H_
+#define _MIPSVM_VCPU_H_
 
 #include "internal/device_table/device_table.h"
 #include "internal/logger/logger.h"
@@ -14,6 +14,8 @@ void vcpu_update(const void *args);
 void vcpu_shutdown();
 
 void vcpu_dump_state();
+
+uint32_t *vcpu_get_pc_ref();
 
 struct vCPU
 {

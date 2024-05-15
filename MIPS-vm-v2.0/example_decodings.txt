@@ -1,0 +1,54 @@
+$a0 = 0b00100
+$a1 = 0b00101
+$v0 = 0b00010
+$ra = 0b11111
+
+// beq a0,a1,4000FC <__start+2C>. | I-type format. 4000FC = 4000D0(PC) + 4 + OFFSET << 2.
+Opcode: 0b000100
+Rs: 0b00100
+Rt: 0b00101
+Offset: 0b0000000000001010
+
+// slt v0,a0,a1 | R-type format.
+Opcode: 0b000000
+Rs: 0b00100
+Rt: 0b00101
+Rd: 0b00010
+Shamt: 0b00000
+Funct: 0b101010
+
+// bnez v0,4000f0 <__start+0x20> | I-type format. 4000f0 = 4000dc(PC) + 4 + Immed << 2.
+Opcode: 0b000101
+Rs: 0b00010
+Rt: 0b00000
+Immed: 0b0000000000000100
+
+// subu a0,a0,a1 | R-type format.
+Opcode: 0b000000
+Rs: 0b00100
+Rt: 0b00101 
+Rd: 0b00100
+Shamt: 0b00000
+Funct: 0b100011
+
+// b 4000d0 | I-type format.
+Opcode: 0b000100
+Rs: 0b00000
+Rt: 0b00000 
+Immed: 0b1111 1111 1111 1001
+
+// move v0,a0 | R-type format
+Opcode: 0b000000
+Rs: 0b00100
+Rt: 0b00000
+Rd: 0b00010
+Shamt: 0b00000
+Funct: 0b100101
+
+// jr ra | R-type format
+Opcode: 0b000000
+Rs: 0b11111
+Rt: 0b00000 
+Rd: 0b00000
+Shamt: 0b00000
+Funct: 0b001000

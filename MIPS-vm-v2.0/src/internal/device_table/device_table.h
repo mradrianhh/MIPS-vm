@@ -1,5 +1,5 @@
-#ifndef _8BITVM_DEVICE_TABLE_H_
-#define _8BITVM_DEVICE_TABLE_H_
+#ifndef _MIPSVM_DEVICE_TABLE_H_
+#define _MIPSVM_DEVICE_TABLE_H_
 
 #include <stdint.h>
 #include <pthread.h>

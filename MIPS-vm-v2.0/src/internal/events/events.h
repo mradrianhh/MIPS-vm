@@ -1,5 +1,5 @@
-#ifndef _8BITVM_EVENTS_H_
-#define _8BITVM_EVENTS_H_
+#ifndef _MIPSVM_EVENTS_H_
+#define _MIPSVM_EVENTS_H_
 #define MAX_EVENT_SUBSCRIPTIONS         (10)
 #define MAX_EVENT_SUBSCRIPTIONS_SIZE    (sizeof(_EventSubscription_t) * MAX_EVENT_SUBSCRIPTIONS)
 #define MAX_EVENT_NAME_SIZE             (50)

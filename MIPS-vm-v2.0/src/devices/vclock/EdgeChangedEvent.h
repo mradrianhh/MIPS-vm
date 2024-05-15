@@ -1,5 +1,5 @@
-#ifndef _8BITVM_TICKEVENT_H_
-#define _8BITVM_TICKEVENT_H_
+#ifndef _MIPSVM_EDGE_CHANGED_EVENT_H_
+#define _MIPSVM_EDGE_CHANGED_EVENT_H_
 
 #include <stdint.h>
 

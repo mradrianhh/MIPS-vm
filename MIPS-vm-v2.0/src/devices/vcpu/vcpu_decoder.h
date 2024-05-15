@@ -1,5 +1,5 @@
-#ifndef _8BITVM_VCPU_DECODER_H_
-#define _8BITVM_VCPU_DECODER_H_
+#ifndef _MIPSVM_VCPU_DECODER_H_
+#define _MIPSVM_VCPU_DECODER_H_
 
 #include <stdint.h>
 #include "vcpu_registers.h"

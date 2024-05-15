@@ -1,5 +1,5 @@
-#ifndef _8BITVM_VCPU_STAGE_BUFFERS_H_
-#define _8BITVM_VCPU_STAGE_BUFFERS_H_
+#ifndef _MIPSVM_VCPU_STAGE_BUFFERS_H_
+#define _MIPSVM_VCPU_STAGE_BUFFERS_H_
 
 typedef struct IF_ID_buffer IF_ID_buffer_t;
 typedef struct ID_EX_buffer ID_EX_buffer_t;

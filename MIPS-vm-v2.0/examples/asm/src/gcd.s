@@ -4,7 +4,7 @@
 __start:
     beq		$a0, $a1, .L2	    # If a == b, goto .L2(exit).
     sgt     $v0, $a1, $a0       # Is b > a?
-    bne		$t0, $t1, .L1	    # Yes, subtract a from b(go to .L1).
+    bne		$v0, $zero, .L1	    # Yes, subtract a from b(go to .L1).
     
     subu    $a0, $a0, $a1       # No, subtract b from a.
     b       __start             # Branch to start and repeaet.

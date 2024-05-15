@@ -1,5 +1,5 @@
-#ifndef _8BITVM_VCLOCK_H_
-#define _8BITVM_VCLOCK_H_
+#ifndef _MIPSVM_VCLOCK_H_
+#define _MIPSVM_VCLOCK_H_
 
 #ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 199309L

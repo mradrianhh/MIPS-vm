@@ -77,6 +77,11 @@ void vcpu_dump_state()
     dump_registers(&vcpu.state);
 }
 
+uint32_t *vcpu_get_pc_ref()
+{
+    return &vcpu.state.register_file[REGISTER_ADDRESS_PC];
+}
+
 //
 // Internal functions
 // ------------------
@@ -155,6 +160,9 @@ void dump_registers(vCPU_state_t *state)
 void handle_rising()
 {
     log_info(&vcpu.logger, ">> CYCLE START.\n");
+    Word_t pc = (Word_t)vcpu.state.register_file[REGISTER_ADDRESS_PC];
+    Word_t instruction = vmemory_fetch_instruction((Word_t)vcpu.state.register_file[REGISTER_ADDRESS_PC]);
+    log_info(&vcpu.logger, "Instruction read: 0x%08x \n", instruction.word);
     /*
     // Fetch instruction
     // 1. Load prev-PC into prev-MAR.
