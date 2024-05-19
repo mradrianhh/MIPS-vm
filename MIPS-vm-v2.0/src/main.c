@@ -1,9 +1,9 @@
-#include "internal/events/events.h"
-#include "internal/device_table/device_table.h"
-#include "devices/vcpu/vcpu.h"
-#include "devices/vmemory/vmemory.h"
-#include "devices/vclock/vclock.h"
-#include "internal/loader/loader.h"
+#include "guest/common/events/events.h"
+#include "guest/common/device_table/device_table.h"
+#include "guest/devices/vcpu/vcpu.h"
+#include "guest/devices/vmemory/vmemory.h"
+#include "guest/devices/vclock/vclock.h"
+#include "guest/common/loader/loader.h"
 
 static void init();
 static void configure();
