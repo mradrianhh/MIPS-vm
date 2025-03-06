@@ -13,8 +13,9 @@
 #include "guest/devices/vclock/EdgeChangedEvent.h"
 
 static LOGICAL_REGISTER_FILE_t logical_register_file;
-static vCPU_state_t prev_state;
 static vCPU_t vcpu;
+static vcpu_insn_execute_t *executers;
+static vcpu_insn_execute_t *rformat_executers;
 
 static void init_state();
 static void init_registers(vCPU_state_t *state);
@@ -22,12 +23,22 @@ static void dump_registers(vCPU_state_t *state);
 static void handle_rising();
 static void handle_falling();
 
-static vCPU_INSN_EXECUTER_MAP_t init_executer_map();
 static void vcpu_insn_execute_nop(vCPU_INSN_OPERANDS_t operands);
 static void vcpu_insn_execute_add(vCPU_INSN_OPERANDS_t operands);
-static void vcpu_insn_execute_mov(vCPU_INSN_OPERANDS_t operands);
-static void vcpu_insn_execute_ldr(vCPU_INSN_OPERANDS_t operands);
-static void vcpu_insn_execute_str(vCPU_INSN_OPERANDS_t operands);
+static void vcpu_insn_execute_addu(vCPU_INSN_OPERANDS_t operands);
+static void vcpu_insn_execute_jr(vCPU_INSN_OPERANDS_t operands);
+static void vcpu_insn_execute_lui(vCPU_INSN_OPERANDS_t operands);
+static void vcpu_insn_execute_addiu(vCPU_INSN_OPERANDS_t operands);
+static void vcpu_insn_execute_beq(vCPU_INSN_OPERANDS_t operands);
+static void vcpu_insn_execute_j(vCPU_INSN_OPERANDS_t operands);
+static void vcpu_insn_execute_jal(vCPU_INSN_OPERANDS_t operands);
+static void vcpu_insn_execute_or(vCPU_INSN_OPERANDS_t operands);
+static void vcpu_insn_execute_sw(vCPU_INSN_OPERANDS_t operands);
+static void vcpu_insn_execute_lw(vCPU_INSN_OPERANDS_t operands);
+static void vcpu_insn_execute_jalr(vCPU_INSN_OPERANDS_t operands);
+static void vcpu_insn_execute_ori(vCPU_INSN_OPERANDS_t operands);
+
+static void vcpu_flush_pipeline();
 
 //
 // External functions
@@ -42,11 +53,32 @@ void vcpu_init()
     vcpu.logger.file_name = "../logs/vcpu.txt";
     logger_init(&vcpu.logger);
 
+    vcache_init(&vcpu.icache, ICACHE_SIZE, 4);
+    vcache_init(&vcpu.dcache, DCACHE_SIZE, 1);
+    vcache_load(&vcpu.icache, 0xDEADBEEF);
+
     log_info(&vcpu.logger, "Initializing.\n");
 
     init_state();
-    vCPU_INSN_EXECUTER_MAP_t executer_map = init_executer_map();
-    vcpu_decoder_init(executer_map);
+
+    // Store handle to executer and rformat_executers and free on shutdown.
+    executers = calloc(OPCODE_MAX_RANGE, sizeof(vcpu_insn_execute_t));
+    executers[LUI] = vcpu_insn_execute_lui;
+    executers[ADDIU] = vcpu_insn_execute_addiu;
+    executers[BEQ] = vcpu_insn_execute_beq;
+    executers[J] = vcpu_insn_execute_j;
+    executers[JAL] = vcpu_insn_execute_jal;
+    executers[SW] = vcpu_insn_execute_sw;
+    executers[LW] = vcpu_insn_execute_lw;
+    executers[ORI] = vcpu_insn_execute_ori;
+    rformat_executers = calloc(FUNCT_MAX_RANGE, sizeof(vcpu_insn_execute_t));
+    rformat_executers[ADD] = vcpu_insn_execute_add;
+    rformat_executers[ADDU] = vcpu_insn_execute_addu;
+    rformat_executers[NOP] = vcpu_insn_execute_nop;
+    rformat_executers[JR] = vcpu_insn_execute_jr;
+    rformat_executers[OR] = vcpu_insn_execute_or;
+    rformat_executers[JALR] = vcpu_insn_execute_jalr;
+    vcpu_decoder_init(&vcpu.state.register_file[REGISTER_ADDRESS_PC], executers, rformat_executers);
 }
 
 void vcpu_update(const void *args)
@@ -66,13 +98,14 @@ void vcpu_shutdown()
 {
     log_info(&vcpu.logger, "Shutting down.\n");
     logger_shutdown(&vcpu.logger);
+    free(executers);
+    free(rformat_executers);
+    vcache_destroy(&vcpu.icache);
+    vcache_destroy(&vcpu.dcache);
 }
 
 void vcpu_dump_state()
 {
-    log_debug(&vcpu.logger, ">> Previous state\n");
-    dump_registers(&prev_state);
-
     log_debug(&vcpu.logger, ">> Current state\n");
     dump_registers(&vcpu.state);
 }
@@ -89,25 +122,16 @@ uint32_t *vcpu_get_pc_ref()
 
 void init_state()
 {
-    // Initialize previous state.
-    init_registers(&prev_state);
-    prev_state.decoded_insn.execute = vcpu_insn_execute_nop;
-    prev_state.decoded_insn.operands.operand1 = 0;
-    prev_state.decoded_insn.operands.operand2 = 0;
-    prev_state.decoded_insn.operands.operand3 = 0;
-
     // Initialize current state.
     init_registers(&vcpu.state);
-    vcpu.state.decoded_insn.execute = vcpu_insn_execute_nop;
-    vcpu.state.decoded_insn.operands.operand1 = 0;
-    vcpu.state.decoded_insn.operands.operand2 = 0;
-    vcpu.state.decoded_insn.operands.operand3 = 0;
+    vcpu_flush_pipeline();
 }
 
 void init_registers(vCPU_state_t *state)
 {
     // Initialize physical register file to 0.
-    memset(&state->register_file, 0, sizeof(state->register_file));
+    memset(&state->register_file, 0, sizeof(REGISTER_t) * MAX_REGISTERS);
+    state->register_file[REGISTER_ADDRESS_PC] = RESET_VECTOR_VADDR;
 
     // Initialize logical register file with names.
     strcpy(logical_register_file[REGISTER_ADDRESS_ZERO], "$zero");
@@ -145,6 +169,7 @@ void init_registers(vCPU_state_t *state)
     strcpy(logical_register_file[REGISTER_ADDRESS_PC], "PC");
     strcpy(logical_register_file[REGISTER_ADDRESS_HI], "HI");
     strcpy(logical_register_file[REGISTER_ADDRESS_LO], "LO");
+    strcpy(logical_register_file[REGISTER_ADDRESS_IR], "IR");
 }
 
 void dump_registers(vCPU_state_t *state)
@@ -160,55 +185,216 @@ void dump_registers(vCPU_state_t *state)
 void handle_rising()
 {
     log_info(&vcpu.logger, ">> CYCLE START.\n");
-    Word_t instruction = vmemory_fetch_instruction(vcpu.state.register_file[REGISTER_ADDRESS_PC]);
-    log_info(&vcpu.logger, "Instruction read: 0x%08x at PC(0x%08x)\n", instruction.word, vcpu.state.register_file[REGISTER_ADDRESS_PC]);
-    vcpu.state.register_file[REGISTER_ADDRESS_PC] += 4;
 
-    /*
-    // Fetch instruction
-    // 1. Load prev-PC into prev-MAR.
-    vcpu.state.register_file[REGISTER_ADDRESS_MAR] = prev_state.register_file[REGISTER_ADDRESS_PC];
-    // 2. Memory controller communicates prev-MAR over address bus.
-    // 3. Memory listens on address bus and returns address.
-    // 4. Memory controller places data into MDR.
-    vcpu.state.register_file[REGISTER_ADDRESS_MDR] = vmemory_fetch(vcpu.state.register_file[REGISTER_ADDRESS_MAR]);
-    // 5. Load MDR into IR.
-    vcpu.state.register_file[REGISTER_ADDRESS_IR] = vcpu.state.register_file[REGISTER_ADDRESS_MDR];
-    log_info(&vcpu.logger, "Fetch: Instruction [0x%02x] at address [0x%02x](PC).\n",
-             vcpu.state.register_file[REGISTER_ADDRESS_IR],
-             prev_state.register_file[REGISTER_ADDRESS_PC]);
-    // 6. Increment prev-PC.
-    vcpu.state.register_file[REGISTER_ADDRESS_PC]++;
+    // There are three stages of the processor: fetch, decode and execute.
+    // Each stage has it's own state and the
+    // state is moved to the next stage on completion.
+    // Because each stage depends on the previous, we have to move backwards so we don't
+    // overwrite the data from the previous cycle.
 
-    // Decode instruction
-    // 1. Decode prev-IR.
-    vcpu.state.decoded_insn = vcpu_decoder_decode(prev_state.register_file[REGISTER_ADDRESS_IR]);
-    log_info(&vcpu.logger, "Decode: Instruction [0x%02x].\n",
-             prev_state.register_file[REGISTER_ADDRESS_IR]);
+    // Third stage - Execute:
+    // - Execute the instruction
+    {
+        log_info(&vcpu.logger, ">>> EXECUTE STAGE(0x%08x).\n", vcpu.state.decode_insn); // BEQ
+        vcpu.state.decoded_insn.execute(vcpu.state.decoded_insn.operands);
+    }
 
-    // Execute instruction
-    // 1. Execute prev-INSN.
-    prev_state.decoded_insn.execute(prev_state.decoded_insn.operands);
-    log_info(&vcpu.logger, "Execute: Instruction [0x%02x].\n", prev_state.decoded_insn.ir);
-    */
+    // Second stage - Decode:
+    // - Decode the instruction.
+    { // NOP
+        vcpu.state.decode_insn = vcpu.state.register_file[REGISTER_ADDRESS_IR];
+        log_info(&vcpu.logger, ">>> DECODE STAGE(0x%08x).\n", vcpu.state.decode_insn);
+        vcpu.state.decoded_insn = vcpu_decoder_decode(vcpu.state.register_file[REGISTER_ADDRESS_IR]);
+    }
+
+    // First stage - Fetch:
+    // - Fetch the next instruction.
+    // - Increase PC.
+    { // NOP
+        vcpu.state.register_file[REGISTER_ADDRESS_IR] = vmemory_read_word(vcpu.state.register_file[REGISTER_ADDRESS_PC]);
+        log_info(&vcpu.logger, ">>> FETCH STAGE(0x%08x).\n", vcpu.state.register_file[REGISTER_ADDRESS_IR]);
+        log_debug(&vcpu.logger, "Fetching instruction at PC(0x%08x): 0x%08x)\n", vcpu.state.register_file[REGISTER_ADDRESS_PC], vcpu.state.register_file[REGISTER_ADDRESS_IR]);
+        vcpu.state.register_file[REGISTER_ADDRESS_PC] += 4;
+    }
 }
 
 void handle_falling()
 {
     log_info(&vcpu.logger, ">> CYCLE END.\n");
-    log_info(&vcpu.logger, ">>\n");
-    // Move vcpu.state to prev_state.
-    prev_state = vcpu.state;
-}
-
-vCPU_INSN_EXECUTER_MAP_t init_executer_map()
-{
-    vCPU_INSN_EXECUTER_MAP_t map;
-    map.executers[NOP] = vcpu_insn_execute_nop;
-
-    return map;
+    log_info(&vcpu.logger, "\n");
 }
 
 void vcpu_insn_execute_nop(vCPU_INSN_OPERANDS_t operands)
 {
+    printf("NOP\n");
+}
+
+void vcpu_insn_execute_add(vCPU_INSN_OPERANDS_t operands)
+{
+    log_debug(&vcpu.logger, "Executing ADD instruction: R%d(0x%08x) + R%d(0x%08x) = R%d\n", operands.rt, vcpu.state.register_file[operands.rt],
+              operands.rs, vcpu.state.register_file[operands.rs], operands.rd);
+    vcpu.state.register_file[operands.rd] = vcpu.state.register_file[operands.rs] + vcpu.state.register_file[operands.rt];
+    log_debug(&vcpu.logger, "Executed ADD instruction: R%d(0x%08x) = R%d + R%d", operands.rd, vcpu.state.register_file[operands.rd], operands.rs, operands.rt);
+    printf("ADD: %d + %d = %d\n", vcpu.state.register_file[operands.rs], vcpu.state.register_file[operands.rt], vcpu.state.register_file[operands.rd]);
+}
+
+void vcpu_insn_execute_addu(vCPU_INSN_OPERANDS_t operands)
+{
+    log_debug(&vcpu.logger, "Executing ADDU instruction: R%d(0x%08x) + R%d(0x%08x) = R%d\n", operands.rt, vcpu.state.register_file[operands.rt],
+              operands.rs, vcpu.state.register_file[operands.rs], operands.rd);
+    vcpu.state.register_file[operands.rd] = vcpu.state.register_file[operands.rs] + vcpu.state.register_file[operands.rt];
+    log_debug(&vcpu.logger, "Executed ADDU instruction: R%d(0x%08x) = R%d + R%d", operands.rd, vcpu.state.register_file[operands.rd], operands.rs, operands.rt);
+    printf("ADDU: R%d(0x%08x) = R%d + R%d\n", operands.rd, vcpu.state.register_file[operands.rd], operands.rs, operands.rt);
+}
+
+void vcpu_insn_execute_jr(vCPU_INSN_OPERANDS_t operands)
+{
+    printf("JR: PC(0x%08x) = R%d(0x%08x)\n", vcpu.state.register_file[REGISTER_ADDRESS_PC], operands.rs, vcpu.state.register_file[operands.rs]);
+    vcpu.state.register_file[REGISTER_ADDRESS_PC] = vcpu.state.register_file[operands.rs];
+    if (vcpu.state.register_file[REGISTER_ADDRESS_PC] % 4 != 0)
+    {
+        log_error(&vcpu.logger, "Error: Misaligned jump address: 0x%08x\n", vcpu.state.register_file[REGISTER_ADDRESS_PC]);
+        return;
+    }
+    log_debug(&vcpu.logger, "Jumping to address: 0x%08x\n", vcpu.state.register_file[REGISTER_ADDRESS_PC]);
+
+    // We need to flush pipeline so we don't execute previously fetched and decoded instructions.
+    // We do this manually because we don't trust the compiler.
+    // vcpu_flush_pipeline();
+}
+
+void vcpu_insn_execute_lui(vCPU_INSN_OPERANDS_t operands)
+{
+    vcpu.state.register_file[operands.rt] = operands.immed << 16;
+    printf("LUI: R%d = 0x%08x\n", operands.rt, vcpu.state.register_file[operands.rt]);
+    log_debug(&vcpu.logger, "Executed LUI instruction: Set R%d to 0x%08x\n", operands.rt, vcpu.state.register_file[operands.rt]);
+}
+
+void vcpu_insn_execute_addiu(vCPU_INSN_OPERANDS_t operands)
+{
+    uint32_t extended_immed;
+    // We need to sign extend. First, append leading zeroes.
+    extended_immed = IMMED_MASK & operands.immed;
+    // Check if we should extend with 1's.
+    if (operands.immed & INSN15_MASK)
+    {
+        // We flip the IMMED_MASK with an XOR so we can flip the upper 16 bits to 1's with an OR.
+        extended_immed |= (IMMED_MASK ^ WORD_HIGH_VALUES);
+    }
+
+    log_debug(&vcpu.logger, "Executing ADDIU instruction: Add 0x%08x to R%d(0x%08x)\n", extended_immed, operands.rt, vcpu.state.register_file[operands.rt]);
+    // Move via uint64_t to prevent wrap-around and allow truncation.
+    uint64_t temp = vcpu.state.register_file[operands.rs] + extended_immed;
+    vcpu.state.register_file[operands.rt] = temp;
+    log_debug(&vcpu.logger, "Executed ADDIU instruction: R%d = 0x%08x\n", operands.rt, vcpu.state.register_file[operands.rt]);
+    printf("ADDIU: R%d(0x%08x) = R%d + 0x%08x\n", operands.rt, vcpu.state.register_file[operands.rs], operands.rt, extended_immed);
+}
+
+void vcpu_insn_execute_beq(vCPU_INSN_OPERANDS_t operands)
+{
+    if (vcpu.state.register_file[operands.rs] == vcpu.state.register_file[operands.rt])
+    {
+        // We calculated the correct address in the decode-stage based on offset and PC, so we only reassign PC here.
+        vcpu.state.register_file[REGISTER_ADDRESS_PC] = operands.address;
+        log_debug(&vcpu.logger, "BEQ executed: Branching to address 0x%08x\n", vcpu.state.register_file[REGISTER_ADDRESS_PC]);
+
+        // We need to flush pipeline so we don't execute the next instructions already loaded by inserting NOP/stall into fetch and decode stage.
+        // We do this manually because we don't trust the compiler.
+        // vcpu_flush_pipeline();
+    }
+    else
+    {
+        log_debug(&vcpu.logger, "BEQ condition not met: No branch taken.\n");
+    }
+}
+
+void vcpu_insn_execute_j(vCPU_INSN_OPERANDS_t operands)
+{
+    printf("J: PC = 0x%08x\n", operands.address);
+    vcpu.state.register_file[REGISTER_ADDRESS_PC] = operands.address;
+    log_debug(&vcpu.logger, "J executed: Jumping to address 0x%08x\n", vcpu.state.register_file[REGISTER_ADDRESS_PC]);
+
+    // vcpu_flush_pipeline();
+}
+
+void vcpu_insn_execute_jal(vCPU_INSN_OPERANDS_t operands)
+{
+    printf("JAL: PC(0x%08x) = 0x%08x\n", vcpu.state.register_file[REGISTER_ADDRESS_PC], operands.address);
+    vcpu.state.register_file[REGISTER_ADDRESS_RA] = vcpu.state.register_file[REGISTER_ADDRESS_PC] - 4;
+    vcpu.state.register_file[REGISTER_ADDRESS_PC] = operands.address;
+    log_debug(&vcpu.logger, "JAL executed: Jumping to address 0x%08x, Link (RA) set to 0x%08x\n", vcpu.state.register_file[REGISTER_ADDRESS_PC], vcpu.state.register_file[REGISTER_ADDRESS_RA]);
+
+    // vcpu_flush_pipeline();
+}
+
+void vcpu_insn_execute_or(vCPU_INSN_OPERANDS_t operands)
+{
+    vcpu.state.register_file[operands.rd] = vcpu.state.register_file[operands.rs] | vcpu.state.register_file[operands.rt];
+    printf("OR: 0x%08x | 0x%08x = 0x%08x\n", vcpu.state.register_file[operands.rs], vcpu.state.register_file[operands.rt], vcpu.state.register_file[operands.rd]);
+    log_debug(&vcpu.logger, "Executed OR instruction: Set R%d to 0x%08x\n", operands.rd, vcpu.state.register_file[operands.rd]);
+}
+
+void vcpu_insn_execute_sw(vCPU_INSN_OPERANDS_t operands)
+{
+    // We need to calculate memory address by sign-extending offset and adding it with
+    // the content of Rs.
+    // First, append leading zeroes.
+    uint32_t extended_immed = IMMED_MASK & operands.immed;
+    // Check if we should extend with 1's.
+    if (operands.immed & INSN15_MASK)
+    {
+        // We flip the IMMED_MASK with an XOR so we can flip the upper 16 bits to 1's with an OR.
+        extended_immed |= (IMMED_MASK ^ WORD_HIGH_VALUES);
+    }
+    // We have to add the extended offset with the content of Rs, but to prevent
+    // C's wraparound, we do it via uint64_t to allow truncation.
+    uint64_t temp = extended_immed + vcpu.state.register_file[operands.rs];
+    // Now we truncate it into uint32_t.
+    uint32_t address = temp;
+    // Finally, we write the content of Rt to that memory location.
+    vmemory_write_word(vcpu.state.register_file[operands.rt], address);
+    log_debug(&vcpu.logger, "SW executed: Stored R%d(0x%08x) to memory address 0x%08x\n", operands.rt, vcpu.state.register_file[operands.rt], address);
+}
+
+void vcpu_insn_execute_lw(vCPU_INSN_OPERANDS_t operands)
+{
+    uint32_t extended_immed = IMMED_MASK & operands.immed;
+
+    if (operands.immed & INSN15_MASK)
+    {
+
+        extended_immed |= (IMMED_MASK ^ WORD_HIGH_VALUES);
+    }
+
+    uint64_t temp = extended_immed + vcpu.state.register_file[operands.rs];
+    uint32_t address = temp;
+
+    vcpu.state.register_file[operands.rt] = vmemory_read_word(address);
+    log_debug(&vcpu.logger, "LW executed: Loaded memory address 0x%08x into R%d(0x%08x)\n", address, operands.rt, vcpu.state.register_file[operands.rt]);
+}
+
+void vcpu_insn_execute_jalr(vCPU_INSN_OPERANDS_t operands)
+{
+    printf("JALR: R%d <-- [PC](0x%08x); PC <-- [R%d](0x%08x)\n", operands.rd, vcpu.state.register_file[REGISTER_ADDRESS_PC]-4, operands.rs, vcpu.state.register_file[operands.rs]);
+    vcpu.state.register_file[operands.rd] = vcpu.state.register_file[REGISTER_ADDRESS_PC] - 4;
+    vcpu.state.register_file[REGISTER_ADDRESS_PC] = vcpu.state.register_file[operands.rs];
+    log_debug(&vcpu.logger, "Jumping to address 0x%08x from 0x%08x\n", vcpu.state.register_file[REGISTER_ADDRESS_PC], vcpu.state.register_file[operands.rd]);
+}
+
+void vcpu_insn_execute_ori(vCPU_INSN_OPERANDS_t operands)
+{
+    vcpu.state.register_file[operands.rt] = vcpu.state.register_file[operands.rs] | (operands.immed | WORD_LOW_VALUES);
+    printf("ORI: 0x%08x | 0x%08x = 0x%08x\n", vcpu.state.register_file[operands.rs], operands.immed, vcpu.state.register_file[operands.rt]);
+    log_debug(&vcpu.logger, "Executed ORI instruction: Set R%d to 0x%08x\n", operands.rt, vcpu.state.register_file[operands.rt]);
+}
+
+// Used to flush pipeline. Should rarely be necessary because the compiler will insert NOPs/stalls into the compiled code to ensure the pipeline is
+// properly flushed.
+void vcpu_flush_pipeline()
+{
+    vcpu.state.register_file[REGISTER_ADDRESS_IR] = 0;
+    vcpu.state.decoded_insn.execute = vcpu_insn_execute_nop;
+    vcpu.state.decoded_insn.operands = (vCPU_INSN_OPERANDS_t){0};
+
+    log_debug(&vcpu.logger, "Pipeline flushed: NOP inserted into fetch and decode stages.\n");
 }

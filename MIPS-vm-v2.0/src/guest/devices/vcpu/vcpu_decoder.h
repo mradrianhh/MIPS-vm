@@ -5,15 +5,28 @@
 #include "vcpu_registers.h"
 
 #define OPCODE_MASK         (uint32_t)(0xFC000000) // (0b1111 1100 0000 0000 0000 0000 0000 0000)
+#define OPCODE_OFFSET       (uint8_t)(0x1A)        // (26) 
 #define RS_MASK             (uint32_t)(0x03E00000) // (0b0000 0011 1110 0000 0000 0000 0000 0000)
+#define RS_OFFSET           (uint32_t)(0x15)       // (21)
 #define RT_MASK             (uint32_t)(0x001F0000) // (0b0000 0000 0001 1111 0000 0000 0000 0000)
+#define RT_OFFSET           (uint8_t)(0x10)        // (16)
 #define RD_MASK             (uint32_t)(0x0000F800) // (0b0000 0000 0000 0000 1111 1000 0000 0000)
+#define RD_OFFSET           (uint8_t)(0x0B)        // (11)
 #define SHAMT_MASK          (uint32_t)(0x000007C0) // (0b0000 0000 0000 0000 0000 0111 1100 0000)
+#define SHAMT_OFFSET        (uint8_t)(0x06)        // (6)
 #define FUNCT_MASK          (uint32_t)(0x0000003F) // (0b0000 0000 0000 0000 0000 0000 0011 1111)
+#define FUNCT_OFFSET        (uint8_t)(0x00)        // (0)
 #define IMMED_MASK          (uint32_t)(0x0000FFFF) // (0b0000 0000 0000 0000 1111 1111 1111 1111)
+#define IMMED_OFFSET        (uint8_t)(0x00)        // (0)
 #define ADDRESS_MASK        (uint32_t)(0x03FFFFFF) // (0b0000 0011 1111 1111 1111 1111 1111 1111)
+#define ADDRESS_OFFSET      (uint8_t)(0x00)        // (0)
 #define OPCODE_MAX_RANGE    (uint32_t)(0x0000003F) // (0b0011 1111) = 64
-
+#define FUNCT_MAX_RANGE     (uint32_t)(0x0000003F) // (0b0011 1111) = 64
+#define INSN15_MASK         (uint16_t)(0x8000)     // (0b1000 0000 0000 0000)
+#define WORD_HIGH_VALUES    (uint32_t)(0xFFFFFFFF) // (0b1111 1111 1111 1111 1111 1111 1111 1111)
+#define WORD_LOW_VALUES     (uint32_t)(0x00000000) // (0b0000 0000 0000 0000 0000 0000 0000 0000)
+#define PC_31_28_MASK       (uint32_t)(0xF0000000) // (0b1111 0000 0000 0000 0000 0000 0000 0000)
+    
 // Summary:
 //   Struct with three indexes for the registers to use.
 //
@@ -29,26 +42,6 @@ typedef struct vCPU_INSN_OPERANDS vCPU_INSN_OPERANDS_t;
 //   Contains a pointer to the decoded instruction function
 //   and the collection of operands that the function will use.
 typedef struct vCPU_INSN vCPU_INSN_t;
-
-// Summary:
-//   Union containing all decoders.
-//
-// Details:
-//   Contains all decoders with their entries mapped
-//   according to the values in vCPU_INSN_TYPE_t.
-//
-//   Decoder map is used by vcpu_decoder to map instructions to decoders.
-typedef union vCPU_INSN_DECODER_MAP vCPU_INSN_DECODER_MAP_t;
-
-// Summary:
-//   Union containing all executers.
-//
-// Details:
-//   Contains all executers with their entries mapped
-//   according to the values in vCPU_INSN_TYPE_t.
-//
-//   Executer map is used by vcpu to implement functions returned by decoders.
-typedef union vCPU_INSN_EXECUTER_MAP vCPU_INSN_EXECUTER_MAP_t;
 
 // Summary:
 //   Enum of all instructions supported by the CPU.
@@ -76,22 +69,7 @@ typedef vCPU_INSN_t (*vcpu_insn_decode_t)(uint32_t instruction);
 
 // Summary:
 //   Initializes the decoders.
-void vcpu_decoder_init(vCPU_INSN_EXECUTER_MAP_t executer_map);
-
-// Summary:
-//   Gets the decoder for the instruction provided.
-//
-// Details:
-//   Maps the instructions opcode to an entry in the decoder-map and returns it.
-//
-// Params:
-//   REGISTER_t: ir:
-//     The instruction to decode.
-//
-// Returns:
-//   vcpu_insn_decoder_t:
-//     Function used to decode the instruction.
-vcpu_insn_decode_t vcpu_decoder_get(REGISTER_t ir);
+void vcpu_decoder_init(REGISTER_t *pc_ref, vcpu_insn_execute_t *executers, vcpu_insn_execute_t *rformat_executers);
 
 // Summary:
 //   Decodes the instruction provided.
@@ -111,40 +89,31 @@ vCPU_INSN_t vcpu_decoder_decode(REGISTER_t ir);
 
 struct vCPU_INSN_OPERANDS
 {
-    uint8_t operand1;
-    uint8_t operand2;
-    uint8_t operand3;
+    uint8_t rs;
+    uint8_t rt;
+    uint8_t rd;
+    uint8_t shamt;
+    uint16_t immed;
+    uint32_t address;
 };
 
 struct vCPU_INSN
 {
-    REGISTER_t ir;
     vcpu_insn_execute_t execute;
     vCPU_INSN_OPERANDS_t operands;
 };
 
-union vCPU_INSN_DECODER_MAP
+enum vCPU_INSN_OPCODE_TYPE
 {
-    struct
-    {
-        vcpu_insn_decode_t nop;
-    };
-    vcpu_insn_decode_t decoders[OPCODE_MAX_RANGE];
-};
-
-union vCPU_INSN_EXECUTER_MAP
-{
-    struct
-    {
-        vcpu_insn_execute_t nop;
-    };
-    vcpu_insn_execute_t executers[OPCODE_MAX_RANGE];
-};
-
-enum vCPU_INSN_TYPE
-{
-    ADD = 0,
-    ADDU,
+    RFORMAT = 0,
+    J = 2,
+    JAL = 3,
+    BEQ = 4,
+    ADDIU = 9,
+    ORI = 13,
+    LUI = 15,
+    LW = 35,
+    SW = 43,
     SUB,
     SUBU,
     MUL, 
@@ -154,35 +123,33 @@ enum vCPU_INSN_TYPE
     SLT,
     SLTU,
     AND,
-    OR,
     XOR,
     NOR,
     ADDI,
-    ADDIU,
     SLTI,
     SLTIU,
     ANDI,
-    ORI,
     XORI,
-    LW,
-    SW,
     LBU,
     LB,
     SB,
-    LUI,
-    BEQ,
     BNE,
     BLEZ,
     BGTZ,
     BLTZ,
-    J,
-    JAL,
-    JR,
-    JALR,
-    NOP,
     MFHI,
     MFLO,
     // TODO: Floating point and exception handling.
+};
+
+enum vCPU_INSN_FUNCT_TYPE
+{
+    NOP = 0,
+    JR = 8,
+    JALR = 9,
+    ADD = 32,
+    ADDU = 33,
+    OR = 37,
 };
 
 #endif

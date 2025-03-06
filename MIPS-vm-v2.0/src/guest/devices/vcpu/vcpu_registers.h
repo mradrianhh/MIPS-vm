@@ -5,7 +5,7 @@
 
 #define BIT(x) ((uint32_t)1 << (x))
 
-#define MAX_REGISTERS   (35)
+#define MAX_REGISTERS   (36)
 
 typedef uint32_t REGISTER_t;
 typedef char LOGICAL_REGISTER_t[5];
@@ -52,6 +52,7 @@ enum REGISTER_ADDRESS
     REGISTER_ADDRESS_PC = 32,
     REGISTER_ADDRESS_HI = 33,
     REGISTER_ADDRESS_LO = 34,
+    REGISTER_ADDRESS_IR = 35
 };
 
 #endif

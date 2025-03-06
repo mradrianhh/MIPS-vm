@@ -11,7 +11,7 @@ static void shutdown();
 
 int main()
 {
-    set_log_level(LOG_LEVEL_INFO);
+    set_log_level(LOG_LEVEL_DEBUG);
     init();
     configure();
     vclock_start();
@@ -32,7 +32,7 @@ void configure()
 {
     event_create("edge_changed");
     event_subscribe("edge_changed", vcpu_update);
-    loader_load_elf32("../examples/asm/build/gcd");
+    loader_load_elf32("../sdk/demo/hello_world/build/helloworld");
 }
 
 void shutdown()

@@ -55,13 +55,15 @@ The logical user address space is the **kuseg**-segment which ranges from addres
 
 # Virtual CPU
 
-The CPU is inspired by the design of a classic RISC pipeline. This means that it's designed to implement a five step pipeline comprising of:
+The CPU is inspired by the design of a classic RISC pipeline. This means that it's designed to implement a five step pipeline comprising of 5 pipestages:
 
-1. Fetch instruction.
-2. Decode instruction and fetch registers.
-3. Execute instruction..
-4. Access memory.
-5. Register write back.
+1. IF: Fetch instruction from I-cache.
+2. RD: Decode instruction and fetch registers.
+3. ALU: Perform arithmethic or logical operation in one clock. Floating-point math and divide/multiply can't be done in one clock.
+4. MEM: Instructions can read/write memory variables in D-cache.
+5. WB: Write back value to register file.
+
+One thing to note is that memory access occurs after the ALU, so an instruction can't perform arithmethic/logical operations on memory variables. They must be fetched into registers first.
 
 Between each stage, there are buffers to forward information from one stage to the next.
 
@@ -69,11 +71,15 @@ Between each stage, there are buffers to forward information from one stage to t
 
 An instruction can have a maximum of two source register and one destination register.
 
-## Instruction fetch
+## Pipestages
+
+The architecture consists of the five pipestages mentioned above, with each pipestage having specific tasks.
+
+### IF: Instruction fetch from I-cache
 
 During instruction fetch, the CPU spends one cycle to fetch the instruction from memory at the address pointed to by the PC. Afterwards, it needs to recalculate the PC. Since all instructions has the same length and this is a 32-bit computer, PC is incremented by 4 bytes. In the case of a branch, jump or exception, the PC needs to be set to the appropriate address. PC will always be incremented here, but it might be re-calculated in the decode stage.
 
-## Instruction decode
+### RD: Read register
 
 This CPU architecture does not use microcode. Decoding is done directly at this stage.
 
@@ -85,7 +91,7 @@ If the decoded instruction is a branch or jump instruction, we need to compute t
 
 Also, if the branch is taken, we will have instructions in the pipeline that we no longer wish to execute, so we need to flush it by overwriting the fetch stage with a stall.
 
-## Instruction execute
+### ALU: Single-cycle arithmetic/logical operations
 
 During this stage, the actual computation occurs. This stage comprises of an ALU and a bit-shifter.
 For our sake, we'll simply execute the computation in the C-language on the host.
@@ -98,7 +104,7 @@ For reference, we'll list the latency classes of RISC instructions below:
 
 - Multi-cycle instrucitons(multiple cycles latency): Integer multiply and divide and all floating-point operations. During the execute stage, the operands to these operations were fed to the multi-cycle multiply/divide unit. The rest of the pipeline was free to continue execution while the multiply/divide unit did its work. To avoid complicating the writeback stage and issue logic, multicycle instruction wrote their results to a separate set of registers.
 
-## Memory access
+### MEM: D-cache read/write
 
 This stage is used by memory reference instructions. The reason that they have a two-cycle latency is that they have two stages of execution. First, the instruction execute stage where the memory access addresses are computed, and then this stage, where the memory is actually accessed.
 
@@ -106,7 +112,7 @@ During this stage, register-to-register instructions are simply forwarded so tha
 
 Note: multi-cycle instructions usually has their separate set of registers, so the port-issue does not apply for them.
 
-## Write-back
+### WB: Register-file write back
 
 During this stage, both the single-cycle and two-cycle latency instructions write their results into the register file.
 
@@ -134,6 +140,72 @@ Note: register banking is the method of having a single logical register name ac
 ## Bubbles and hazards
 
 A bubble is inserted during a stall. A bubble is simply a NOP-instruction that will flow through the pipeline preventing each stage from doing any work.
+
+## Caches
+
+There are implemented two distinct caches: an instruction cache(I-cache) and a data cache(D-cache).
+Access to the caches requires just a single-cycle, and both the I- and D-cache can be accessed
+simultaneously.
+
+### Mapping and indexing
+
+Both caches are direct mapped, physically indexed and physically tagged. 
+
+The CPUs program address is translated to a physical address just as in the case of real memory addressing, 
+before being used for the cache lookup. 
+Tag comparison(looking for a hit) is also based on physical addresses.
+
+The caches are direct mapped meaning that each physical address as only one location in each cache
+where it may reside. Each cache index consists of a tag and a cache line. For the D-cache, the cache line 
+consists of a one word data item, but for the I-cache it's usually a 4-word line. The tag contains the memory address
+for which this data is a copy.
+
+If the tag matches the higher-order address bits, then the cache line contains the data the CPU is
+looking for. The data is returned and execution continues. However, for the I-cache, the two lower-address
+bits are used to index into the cache line and select one of the four words. 
+
+When a cache miss occurs, the whole line must be filled from memory. It is however possible to fetch
+more than a line's worth of data. In the case of the D-cache, it's possible to fetch 4 words of data
+which is then stored in 4 1-word lines. It's important to note that because the D-cache is write-through
+the main-memory and cache is always up-to-date. This means that we can discard the previous data when 
+refilling the line at an index without concern.
+
+### D-cache
+
+The data cache is of type write-through meaning that writes to the D-cache are 
+passed through directly to memory via a writeable buffer.
+
+During a data load, we attempt to read data from a cacheable location. In this case, the data will be 
+returned from the D-cache if the cache contains the corresponding physical address and the cache line is 
+valid. This is called a "cache hit". 
+
+If not, we have what is called a "cache miss" in which case the data is not found. We then have to
+read the data from external memory(i.e ram). How this is implemented can differ between implementations, 
+but generally the CPU will read one or more words from memory which is then loaded into the D-cache. 
+Normal operation then proceeds.
+
+In normal operation, a "cache miss" will cause the targeted cache line to "invalidate" the valid cache data.
+This data is then discarded without any issue because the D-cache is write-through, meaning that cache-data
+is never more up-to-date than memory.
+
+If we attempt to load data from an uncacheable location, the data is always fetched from external memory
+or a memory-mapped IO location. On rare occasions, a system might attempt to access a data location
+as both cached and uncached. There are no issues with this because when you perform an uncacheable load,
+the cache data is neither used nor updated. The same applies for data stores.
+
+In all cases, when performing a cacheable store, it's also written to main memory to ensure that the cache
+and main memory are up-to-date. The write-through occurs asynchronously though through a writable buffer.
+
+If performing a cacheable 32-bit store, the cache is always updated, but possibly discarding data from
+a previously cached location.
+
+For byte or half-word stores, the cache will only be updated if the reference hits in the cache.
+If the reference hits, data will be extracted from the cache, merged with the store data and, finally, 
+written back.
+
+If the partial-word store misses in the cache, the cache is left alone.
+
+### I-cache
 
 ## Exceptions
 

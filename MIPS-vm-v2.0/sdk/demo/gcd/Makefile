@@ -19,19 +19,23 @@ INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # Use 'mipsel' for little endian or 'mips' for big endian.
-CFLAGS := $(INC_FLAGS) -MMD -MP -g -ffreestanding
+CFLAGS := $(INC_FLAGS) -MMD -MP -ffreestanding
 CC = mips-none-elf-gcc
 
-LDFLAGS := -g -L./lib -lr3000 -Wl,-T,../../R3000.ld
+ASFLAGS := -mips1
+AS = mips-none-elf-as
+
+LDFLAGS := -T ../../R3000.lds -Map $(BUILD_DIRS)/mapfile.txt
+LD = mips-none-elf-ld
 
 # The final build step.
 $(BUILD_DIRS)/$(TARGET): $(OBJS)
-	$(CC) $(OBJS) -o $@ $(LDFLAGS)
+	$(LD) $(OBJS) -o $@ $(LDFLAGS)
 
 # Build step for asm source
 $(BUILD_DIRS)/%.s.o: %.s
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(AS) $(ASFLAGS) $< -o $@
 
 # Build step for C source
 $(BUILD_DIRS)/%.c.o: %.c

@@ -62,18 +62,16 @@ void loader_load_elf32(const char *filename)
         }
         if (ph[i].p_type == PT_LOAD)
         {
+            uint32_t phys_addr = vmemory_map_pgm_to_phys_addr(ph[i].p_vaddr);
             if (ph[i].p_filesz)
             {
                 fseek(fp, ph[i].p_offset, SEEK_SET);
-                fread(&memory_ref[ph[i].p_vaddr], ph[i].p_filesz, 1, fp);
+                fread(&memory_ref[phys_addr], ph[i].p_filesz, 1, fp);
             }
             if (ph[i].p_filesz < ph[i].p_memsz)
             {
-                memset(&memory_ref[ph[i].p_vaddr + ph[i].p_filesz], 0, ph[i].p_memsz - ph[i].p_filesz);
+                memset(&memory_ref[phys_addr + ph[i].p_filesz], 0, ph[i].p_memsz - ph[i].p_filesz);
             }
         }
     }
-
-    // Point PC to entry point.
-    *pc_ref = eh.e_entry;
 }

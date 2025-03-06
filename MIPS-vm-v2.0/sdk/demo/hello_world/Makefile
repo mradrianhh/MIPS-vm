@@ -1,9 +1,9 @@
-TARGET := main
+TARGET := helloworld
 
 BUILD_DIRS := ./build
 SRC_DIRS := ./src
 
-SRCS := $(shell find $(SRC_DIRS) -name '*.c' -or -name '*.s')
+SRCS := $(shell find $(SRC_DIRS) -name '*.c' -or -name '*.s' -or -name '*.S')
 
 # Prepends BUILD_DIR and appends .o to every src file
 # As an example, ./your_dir/hello.cpp turns into ./build/./your_dir/hello.cpp.o
@@ -19,14 +19,15 @@ INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # Use 'mipsel' for little endian or 'mips' for big endian.
-CFLAGS := $(INC_FLAGS) -MMD -MP -g -ffreestanding
+CFLAGS := $(INC_FLAGS) -MMD -MP -ffreestanding -v
 CC = mips-none-elf-gcc
 
-LDFLAGS := -g -L./lib -lr3000 -Wl,-T,../../R3000.ld
+LDFLAGS := -T ../../R3000.lds -Map $(BUILD_DIRS)/mapfile.txt
+LD = mips-none-elf-ld
 
 # The final build step.
 $(BUILD_DIRS)/$(TARGET): $(OBJS)
-	$(CC) $(OBJS) -o $@ $(LDFLAGS)
+	$(LD) $(OBJS) -o $@ $(LDFLAGS)
 
 # Build step for asm source
 $(BUILD_DIRS)/%.s.o: %.s
@@ -35,6 +36,10 @@ $(BUILD_DIRS)/%.s.o: %.s
 
 # Build step for C source
 $(BUILD_DIRS)/%.c.o: %.c
+	mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIRS)/%.S.o: %.S
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
