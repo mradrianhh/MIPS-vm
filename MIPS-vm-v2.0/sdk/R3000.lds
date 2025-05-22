@@ -9,7 +9,8 @@ SECTIONS {
         KEEP(*(.intvecs))
     }> FLASH
 
-    .text : {       
+    .text : {
+        KEEP(*(.text.Reset_Handler))
         KEEP(*(.text))
         *(.text.*)
         . = ALIGN(4);
@@ -22,7 +23,7 @@ SECTIONS {
         __init_array_end = .;
         KEEP(*(.init))
         KEEP(*(.fini*))
-    }> FLASH AT> FLASH
+    }> FLASH AT> FLASH 
 
     .rodata : {
         *(.rodata);

@@ -17,10 +17,6 @@ void vcache_init(vCache_t *cache, size_t byte_size, size_t line_size)
         fprintf(stderr, "Failed to allocate memory for vCache data\n");
         exit(EXIT_FAILURE);
     }
-    printf("vCache initialized.\n");
-    printf("\tSize: %zu bytes\n", byte_size);
-    printf("\tCache line size: %zu bytes\n", cache->line_size);
-    printf("\tTotal entry size: %zu bytes\n", cache->entry_size);
 }
 
 uint32_t vcache_load(vCache_t *cache, uint32_t paddr)
@@ -33,6 +29,7 @@ uint32_t vcache_load(vCache_t *cache, uint32_t paddr)
     {
         fprintf(stderr, "Error: invalid paddr. Lower two bits attempts to select word from cache line\n");
         fprintf(stderr, "that exceeds the number of words.\n");
+        exit(EXIT_FAILURE);
     }
 
     // We search the cache. Current points at the current word in the cache. The first word should
@@ -57,6 +54,10 @@ uint32_t vcache_load(vCache_t *cache, uint32_t paddr)
     // For now, we just print an error and return 0.
     fprintf(stderr, "Cache miss for paddr 0x%08x\n", paddr);
     return 0;
+}
+
+void vcache_store(vCache_t *cache, uint32_t value, uint32_t paddr)
+{
 }
 
 void vcache_destroy(vCache_t *cache)

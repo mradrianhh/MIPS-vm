@@ -6,12 +6,13 @@
 #include "loader.h"
 #include "convert.h"
 #include "guest/devices/vmemory/vmemory.h"
+#include "guest/devices/vmemory/mapping.h"
 #include "guest/devices/vcpu/vcpu.h"
 
 void loader_load_elf32(const char *filename)
 {
     FILE *fp;
-    uint8_t *memory_ref = vmemory_get_memory_ref();
+    vMemory_t *memory_ref = vmemory_get_memory_ref();
     uint32_t *pc_ref = vcpu_get_pc_ref();
     Elf32_Ehdr eh;
     Elf32_Phdr ph[16];
@@ -62,7 +63,8 @@ void loader_load_elf32(const char *filename)
         }
         if (ph[i].p_type == PT_LOAD)
         {
-            uint32_t phys_addr = vmemory_map_pgm_to_phys_addr(ph[i].p_vaddr);
+            uint8_t cacheable;
+            uint32_t phys_addr = address_translation(ph[i].p_vaddr, ACCESS_MODE_STORE, &cacheable);
             if (ph[i].p_filesz)
             {
                 fseek(fp, ph[i].p_offset, SEEK_SET);
@@ -74,4 +76,33 @@ void loader_load_elf32(const char *filename)
             }
         }
     }
+}
+
+void loader_flash_rom(const char *filename)
+{
+    FILE *fp;
+    vMemory_t *memory_ref = vmemory_get_memory_ref();
+
+    if ((fp = fopen(filename, "rb")) == NULL)
+    {
+        printf("ERROR: Can't open binary-file %s.\n", filename);
+        exit(EXIT_FAILURE);
+    }
+
+    // Find size.
+    fseek(fp, 0, SEEK_END);
+    size_t filesize = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+
+    if((RESET_VECTOR_PADDR + filesize) > VMEMORY_SIZE)
+    {
+        printf("ERROR: Not enough memory to load the ROM.\n");
+        fclose(fp);
+        exit(EXIT_FAILURE);
+    }
+
+    // Read into memory.
+    fread(&memory_ref->start[RESET_VECTOR_PADDR], filesize, 1, fp);
+    fclose(fp);
+    printf("Successfully flashed ROM from %s, filesize: %zu bytes.\n", filename, filesize);
 }

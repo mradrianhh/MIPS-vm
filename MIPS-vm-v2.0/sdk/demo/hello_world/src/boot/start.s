@@ -1,15 +1,7 @@
     # See: https://s3-eu-west-1.amazonaws.com/downloads-mips/documents/MD00901-2B-CPS-APP-01.03.pdf
 
     .set        noreorder
-    .set        noat
-
-
-    .section    .intvecs
-    .global     _intvecs
-_intvecs:
-    .word       __StackTop
-    .word       Reset_Handler                           
-
+    .set        noat                     
 
     .section    .text.Reset_Handler
     .global     Reset_Handler
@@ -41,7 +33,7 @@ init_common_resources:
     jalr    $a2
     nop
 
-    la      $ra,            all_done                # We should give control to main here, but for now we just loop.
+    la      $ra,            main                # We should give control to main here, but for now we just loop.
     jr      $ra
     nop
 
@@ -103,6 +95,21 @@ init_cp0:
     nop
 
 init_tlb:
+    mfc0    $t0, $10                                # Save ASID.
+    mtc0    $zero, $2                               # tlblo = !valid
+    li      $a1, 64 << 8                            # Index starts at 63.
+    li      $a0, 0xA0000000                         # Used to write impossible VPN to EntryHi.
+
+    .set    noreorder
+1:
+    subu    $a1, 1 << 8                             # Decrease a1
+    mtc0    $a1, $0                                 # Write $a1 index to C0_INDEX.
+    mtc0    $a0, $10                                # Write impossible VPN to EntryHi.
+    bnez    $a1, 1b                                 # Branch if not zero to loop back.
+    tlbwi                                           # BDSLOT.
+    .set reorder
+    
+    mtc0    $t0, $10                                # Restore ASID.
     jr      $ra                                     # jump to $ra
     nop
 

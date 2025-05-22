@@ -19,10 +19,10 @@ INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # Use 'mipsel' for little endian or 'mips' for big endian.
-CFLAGS := $(INC_FLAGS) -MMD -MP -ffreestanding -v
+CFLAGS := $(INC_FLAGS) -MMD -MP -ffreestanding -v 
 CC = mips-none-elf-gcc
 
-LDFLAGS := -T ../../R3000.lds -Map $(BUILD_DIRS)/mapfile.txt
+LDFLAGS := -T ../../R3000.lds -Map $(BUILD_DIRS)/mapfile.txt --oformat=binary
 LD = mips-none-elf-ld
 
 # The final build step.

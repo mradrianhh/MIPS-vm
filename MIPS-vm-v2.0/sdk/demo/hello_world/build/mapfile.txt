@@ -1,4 +1,10 @@
 
+Discarded input sections
+
+ .reginfo       0x0000000000000000       0x18 ./build/./src/common/tlb_mgmt.s.o
+ .MIPS.abiflags
+                0x0000000000000000       0x18 ./build/./src/common/tlb_mgmt.s.o
+
 Memory Configuration
 
 Name             Origin             Length             Attributes
@@ -9,44 +15,49 @@ FLASH            0x00000000bfc00000 0x00000000003fffff xrw
 Linker script and memory map
 
 LOAD ./build/./src/boot/start.s.o
+LOAD ./build/./src/common/tlb_mgmt.s.o
 
-.intvecs        0x00000000bfc00000        0x8
+.intvecs
  *(.intvecs)
- .intvecs       0x00000000bfc00000        0x8 ./build/./src/boot/start.s.o
-                0x00000000bfc00000                _intvecs
 
-.text           0x00000000bfc00000      0x120
- *(.text)
- .text          0x00000000bfc00000        0x0 ./build/./src/boot/start.s.o
- *(.text.*)
+.text           0x00000000bfc00000      0x1f0
+ *(.text.Reset_Handler)
  .text.Reset_Handler
-                0x00000000bfc00000      0x120 ./build/./src/boot/start.s.o
+                0x00000000bfc00000      0x150 ./build/./src/boot/start.s.o
                 0x00000000bfc00000                Reset_Handler
-                0x00000000bfc00120                . = ALIGN (0x4)
+ *(.text)
+ .text          0x00000000bfc00150        0x0 ./build/./src/boot/start.s.o
+ .text          0x00000000bfc00150       0xa0 ./build/./src/common/tlb_mgmt.s.o
+                0x00000000bfc00150                ret_tlblo
+                0x00000000bfc00194                ret_tlbhi
+                0x00000000bfc001d8                ret_tlbpid
+ *(.text.*)
+                0x00000000bfc001f0                . = ALIGN (0x4)
  *(.ctors)
-                0x00000000bfc00120                . = ALIGN (0x4)
+                0x00000000bfc001f0                . = ALIGN (0x4)
  *(.dtors)
-                0x00000000bfc00120                . = ALIGN (0x4)
-                0x00000000bfc00120                __init_array_start = .
+                0x00000000bfc001f0                . = ALIGN (0x4)
+                0x00000000bfc001f0                __init_array_start = .
  *(.init_array*)
-                0x00000000bfc00120                __init_array_end = .
+                0x00000000bfc001f0                __init_array_end = .
  *(.init)
  *(.fini*)
 
 .rodata
  *(.rodata)
  *(.rodata.*)
-                0x00000000bfc00120                __etext = .
+                0x00000000bfc001f0                __etext = .
 
-.MIPS.abiflags  0x00000000bfc00120       0x18
+.MIPS.abiflags  0x00000000bfc001f0       0x18
  .MIPS.abiflags
-                0x00000000bfc00120       0x18 ./build/./src/boot/start.s.o
+                0x00000000bfc001f0       0x18 ./build/./src/boot/start.s.o
 
-.data           0x00000000a0000000        0x0 load address 0x00000000bfc00138
-                0x00000000bfc00138                __data_load__ = LOADADDR (.data)
+.data           0x00000000a0000000        0x0 load address 0x00000000bfc00208
+                0x00000000bfc00208                __data_load__ = LOADADDR (.data)
                 0x00000000a0000000                __data_start__ = .
  *(.data)
  .data          0x00000000a0000000        0x0 ./build/./src/boot/start.s.o
+ .data          0x00000000a0000000        0x0 ./build/./src/common/tlb_mgmt.s.o
  *(.data.*)
                 0x00000000a0000000                . = ALIGN (0x4)
                 0x00000000a0000000                __data_end__ = .
@@ -56,6 +67,7 @@ LOAD ./build/./src/boot/start.s.o
  *(.shbss)
  *(.bss)
  .bss           0x00000000a0000000        0x0 ./build/./src/boot/start.s.o
+ .bss           0x00000000a0000000        0x0 ./build/./src/common/tlb_mgmt.s.o
  *(.bss.*)
  *(COMMON)
  *(.sbss)
@@ -76,15 +88,18 @@ LOAD ./build/./src/boot/start.s.o
  *(.stack)
                 0x00000000bfbfffff                __StackTop = (ORIGIN (RAM) + LENGTH (RAM))
                 [!provide]                        PROVIDE (__stack = __StackTop)
-OUTPUT(build/helloworld elf32-bigmips)
+OUTPUT(build/helloworld binary)
 
 .reginfo        0x0000000000000000       0x18
  .reginfo       0x0000000000000000       0x18 ./build/./src/boot/start.s.o
 
 .pdr            0x0000000000000000        0x0
  .pdr           0x0000000000000000        0x0 ./build/./src/boot/start.s.o
+ .pdr           0x0000000000000000        0x0 ./build/./src/common/tlb_mgmt.s.o
 
 .gnu.attributes
-                0x0000000000000000       0x10
+                0x0000000000000000       0x20
  .gnu.attributes
                 0x0000000000000000       0x10 ./build/./src/boot/start.s.o
+ .gnu.attributes
+                0x0000000000000010       0x10 ./build/./src/common/tlb_mgmt.s.o
